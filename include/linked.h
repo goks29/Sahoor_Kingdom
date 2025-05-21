@@ -1,5 +1,5 @@
-#ifndef Kingdom_h
-#define Kingdom_h
+#ifndef linked_h
+#define linked_h
 #include "BOOLEAN.H"
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,9 +10,10 @@
 /*TIPE DATA*/
 
 typedef char infotype[50];
+typedef struct Node NodeK;
 typedef NodeK* NkAdd;
 
-// Info
+/*INFO*/
 typedef struct Info_Orang{
     infotype info;
     int Usia;
@@ -21,7 +22,7 @@ typedef struct Info_Orang{
     boolean IsHidup;
 }Info;
 
-// Node
+/*NODE*/
 typedef struct Node {
     Info Identitas;
     NkAdd FirstSon;
@@ -29,28 +30,8 @@ typedef struct Node {
     NkAdd Parents;
 }NodeK;
 
-typedef struct nKTree {
-    NkAdd root;
-}NTree;
 
-// Struktur List (untuk Stack & Queue)
-typedef struct {
-	  NkAdd Front;
-	  NkAdd Rear;
-	  NkAdd Top;
-	  NkAdd Head;
-} List;
-
-// Queue
-typedef List Queue;
-
-// Stack
-typedef List Stack;
-
-
-// Fungsi
-
-boolean IsEmpty(NTree* P);
+/*FUNGSI*/
 
 NkAdd CreateNode(NkAdd parents, infotype name, int usia, boolean gender, boolean hidup);
 

@@ -1,8 +1,4 @@
-#include "Kingdom.h"
-
-boolean IsEmpty(NTree* P) {
-    return (P->root == NULL);
-}
+#include "linked.h"
 
 NkAdd CreateNode(NkAdd parents, infotype name, int usia, boolean gender, boolean hidup) {
     NkAdd newnode = (NkAdd)malloc(sizeof(NodeK));
