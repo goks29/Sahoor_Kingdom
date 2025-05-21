@@ -10,8 +10,7 @@
 /*TIPE DATA*/
 
 typedef char infotype[50];
-typedef struct Node NodeK;
-typedef NodeK* NkAdd;
+typedef struct Node* NkAdd;
 
 /*INFO*/
 typedef struct Info_Orang{

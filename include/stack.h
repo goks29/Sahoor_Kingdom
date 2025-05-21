@@ -4,12 +4,11 @@
 
 /*TIPE DATA*/
 
-typedef struct StackNode SNode;
-typedef SNode* Saddress;
+typedef struct StackNode* Saddress;
 
 typedef struct SNode {
     NkAdd data;
-    Saddress next;
+    struct SNode* next;
 } StackNode;
 
 typedef struct {

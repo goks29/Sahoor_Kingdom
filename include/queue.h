@@ -4,18 +4,17 @@
 
 /*TIPE DATA*/
 
-typedef struct queueNode QNode;
-typedef QNode* Qaddress;
+typedef struct QNode* Qaddress;
 
 typedef struct QNode {
     NkAdd data;
-    Qaddress next;
-}queueNode;
+    struct QNode* next;
+} QNode;
 
 typedef struct {
     Qaddress front;
     Qaddress rear;
-}Queue;
+} Queue;
 
 
 /*FUNGSI*/
