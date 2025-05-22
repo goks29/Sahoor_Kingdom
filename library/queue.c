@@ -31,5 +31,15 @@ void EnQueue (Queue* Q, NkAdd node) {
 }
 
 void DeQueue (Queue* Q, NkAdd node) {
-    
+    if (!IsEmptyQueue(Q)) {
+        Qaddress temp = Q->front;
+        node = temp->data;
+        Q->front = Q->front->next;
+
+        if (Q->front == NULL) {
+            Q->rear = NULL;
+        }
+
+        free(temp);
+    }
 }   

@@ -6,9 +6,9 @@
 
 typedef struct StackNode* Saddress;
 
-typedef struct SNode {
+typedef struct StackNode {
     NkAdd data;
-    struct SNode* next;
+    Saddress next;
 } StackNode;
 
 typedef struct {

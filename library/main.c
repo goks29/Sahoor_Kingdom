@@ -1,7 +1,4 @@
-#include "linked.h"
-#include "queue.h"
-#include "stack.h"
-#include "nbtrees.h"
+#include "Kingdom.h"
 #include <stdio.h>
 
 int main () {
