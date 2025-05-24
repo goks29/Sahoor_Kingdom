@@ -6,8 +6,13 @@
 
 typedef struct StackNode* Saddress;
 
-typedef struct StackNode {
+typedef struct {
     NkAdd data;
+    int generation;
+}StackItem;
+
+typedef struct StackNode {
+    StackItem data;
     Saddress next;
 } StackNode;
 
@@ -21,9 +26,9 @@ void InitStack(Stack* S);
 
 boolean IsEmptyStack(Stack* S);
 
-void Push(Stack* S, NkAdd Node);
+void Push(Stack* S, StackItem Node);
 
-void Pop(Stack* S, NkAdd Node);
+StackItem Pop(Stack* S);
 
 
 

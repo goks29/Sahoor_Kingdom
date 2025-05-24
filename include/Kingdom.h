@@ -5,29 +5,42 @@
 #include "queue.h"
 #include "stack.h"
 #include "nbtrees.h"
-#include "Kingdom.h"
 
+/*Prosedur Utama Kerajaan*/
 void InsertKing(NTree* tree);
 
-void InsertPasangan(NTree* tree);
+void InsertPasangan(NTree* tree, char* KingName);
 
-void InsertMember(NTree* tree);
+void InsertMember(NTree* tree, char* parentName);
 
-void Generation();
+void CheckGeneration(NTree tree);
 
 void PrintSilsilah(NTree tree);
 
-void TurunTahta();
+void TurunTahta(NTree* tree, char* KingName);
+
+void WarisHarta();
+
+void NextKing(NkAdd root);
 
 void TimeSKip(NkAdd node, int year);
 
+
+/*Prosedur file dan assets*/
 void getKingdomFromFile(NTree* Tree);
 
 void getDataFromFile(NTree* Tree);
 
 void printFromFile(const char* location);
 
-void NextKing(NkAdd root);
+
+/*fungsi pengecekan*/
+boolean HasPartner(NkAdd node);
+
+boolean IsKingExist(NTree* tree);
+
+
+
 
 
 
