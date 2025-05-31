@@ -31,7 +31,6 @@ StackItem Pop(Stack* S) {
         return item;
     } else {
         item.data = NULL;
-        item.generation = -1;
         return item;
     }
 }

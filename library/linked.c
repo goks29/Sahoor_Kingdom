@@ -18,5 +18,17 @@ NkAdd CreateNode(NkAdd parents, infotype name, int usia, boolean gender, boolean
 }
 
 PartAdd CreateNPartner (infotype name, int usia, boolean gender, boolean hidup) {
-    
+    PartAdd newnode = (PartAdd)malloc(sizeof(NkPartner));
+
+    if (newnode != NULL) {
+        strcpy(newnode->Identitas.info, name);
+        newnode->Identitas.Gender = gender;
+        newnode->Identitas.IsHidup = hidup;
+        newnode->Identitas.Usia = usia;
+    } else {
+        printf("Alokasi Gagal");
+        return 0;
+    }
+
+    return newnode;
 }

@@ -8,7 +8,6 @@ typedef struct StackNode* Saddress;
 
 typedef struct {
     NkAdd data;
-    int generation;
 }StackItem;
 
 typedef struct StackNode {

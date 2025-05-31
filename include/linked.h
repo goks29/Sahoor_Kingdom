@@ -41,7 +41,4 @@ NkAdd CreateNode(NkAdd parents, infotype name, int usia, boolean gender, boolean
 
 PartAdd CreateNPartner (infotype name, int usia, boolean gender, boolean hidup);
 
-
-
-
 #endif

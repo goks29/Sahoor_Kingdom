@@ -6,6 +6,7 @@
 
 typedef struct Nbtree {
     NkAdd* root;
+    NkAdd* Raja;
 }NTree;
 
 /*FUNGSI*/
@@ -19,8 +20,6 @@ void AddChild (NTree* T, NkAdd child);
 NkAdd SearchNode (NTree* T, const char* name);
 
 void PrintTree (NTree T);
-
-
 
 
 #endif
