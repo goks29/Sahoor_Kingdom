@@ -9,13 +9,13 @@
 
 /*TIPE DATA*/
 
-typedef char infotype[50];
+typedef const char* infotype;
 typedef struct Node* NkAdd;
 typedef struct Partner* PartAdd;
 
 /*INFO*/
 typedef struct Info_Orang{
-    infotype info;
+    char info[50];
     int Usia;
     boolean Gender;
     boolean IsHidup;
@@ -37,8 +37,8 @@ typedef struct Node {
 
 /*FUNGSI*/
 
-NkAdd CreateNode(NkAdd parents, infotype name, int usia, boolean gender, boolean hidup);
+NkAdd CreateNode(NkAdd parents, const char* name, int usia, boolean gender, boolean hidup);
 
-PartAdd CreateNPartner (infotype name, int usia, boolean gender, boolean hidup);
+PartAdd CreateNPartner (const char* name, int usia, boolean gender, boolean hidup);
 
 #endif

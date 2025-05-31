@@ -1,11 +1,13 @@
 #ifndef nbtrees_h
 #define nbtrees_h
+
 #include "linked.h"
+#include "BOOLEAN.H"
 
 /*TIPE DATA*/
 
 typedef struct Nbtree {
-    NkAdd* root;
+    NkAdd root;
 }NTree;
 
 /*FUNGSI*/
@@ -14,9 +16,11 @@ void InitNbTree (NTree* T);
 
 boolean IsEmptyTree (NTree* T);
 
-void AddChild (NTree* T, NkAdd child);
+void AddChild (NTree* T, const char* parents, infotype name, int usia, boolean gender, boolean hidup);
 
-NkAdd SearchNode (NTree* T, const char* name);
+NkAdd SearchNode (NkAdd curNode, const char* name);
+
+void PrintTreeRek(NkAdd node, int level);
 
 void PrintTree (NTree T);
 
