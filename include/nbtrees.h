@@ -6,7 +6,6 @@
 
 typedef struct Nbtree {
     NkAdd* root;
-    NkAdd* Raja;
 }NTree;
 
 /*FUNGSI*/
