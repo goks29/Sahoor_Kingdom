@@ -3,11 +3,11 @@
 /*Prosedur Utama Kerajaan*/
 void InsertLeluhur(NTree* tree) {
 
-    if(tree == NULL){
+    if(IsEmptyTree){
         printf("Tree Belum Ada");
         return;
     }
-    if(tree->root != NULL){
+    if(!IsEmptyTree){
         printf("Tree Sudah Memiliki root");
         return;
     }
@@ -31,9 +31,8 @@ void InsertLeluhur(NTree* tree) {
         scanf("%d", &gender);
         printf("Apakah masih hidup? (1 = Ya, 0 = Tidak): ");
         scanf("%d", &isHidup);
-
         getchar();
-    // Isi data ke node menggunakan strcpy
+
         strcpy(newRoot->Identitas.info, NamaLeluhur);
         newRoot->Identitas.Usia = usia;
         newRoot->Identitas.Gender = (boolean)gender;
@@ -53,6 +52,11 @@ void InsertLeluhur(NTree* tree) {
 }
 
 void InsertPasangan(NTree* tree, char* KingName) {
+    
+    if(tree == NULL || tree->root == NULL){
+        printf("Tree Belum Ada atau Root Kosong");
+        return;
+    }
 
 }
 
@@ -90,8 +94,4 @@ void printFromFile(const char* location) {
 /*fungsi pengecekan*/
 boolean HasPartner(NkAdd node) {
 
-}
-
-boolean IsLeluhurExist(NTree* tree) {
-    
 }
