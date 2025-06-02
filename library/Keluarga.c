@@ -72,13 +72,13 @@ void InsertPasangan(NTree* tree, char* NamaNode) {
     }
 
     if(TargetNode->Pasangan != NULL){
-        printf("%c sudah memiliki pasangan",NamaNode);
+        printf("%s sudah memiliki pasangan",NamaNode);
         return;
     }
-    
-    printf("Masukan Nama Pasangan dari %c : ",NamaNode);
+
+    printf("Masukan Nama Pasangan dari %s : ",NamaNode);
     scanf(" %[^\n]",NamaPasangan);
-    printf("Masukan Usia Pasangan %c : ",NamaNode);
+    printf("Masukan Usia Pasangan %s : ",NamaNode);
     scanf("%d",&umur);
     if(TargetNode->Identitas.Gender == 1){
         gender = 0;
@@ -97,6 +97,29 @@ void InsertPasangan(NTree* tree, char* NamaNode) {
 }
 
 void InsertMember(NTree* tree, char* parentName) {
+    
+    char namaAnak[50];
+    int umur,tempGender;
+    boolean gender,IsHidup;
+
+    if(IsEmptyTree(tree)){
+        printf("Root Belum Ada");
+        return;
+    }
+
+    printf("Masukan Nama Anak dari %s yang Akan Dimasukan : ",parentName);
+    scanf(" %[^\n]",namaAnak);
+    printf("Masukan Usia %s : ",namaAnak);
+    scanf("%d",&umur);
+    printf("Pilih Gender %s (0 = Perempuan, 1 = Laki-laki) : ");
+    scanf("%d",&tempGender);
+    if(tempGender == 0){
+        gender = 0;
+    }else{
+        gender = 1;
+    }
+
+    AddChild(tree,parentName,namaAnak,umur,gender,IsHidup);
 
 }
 

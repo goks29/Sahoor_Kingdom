@@ -2,8 +2,10 @@
 #include "keluarga.h"
 
 int main() {
+
     NTree silsilah;
     InitNbTree(&silsilah);
+
 
     // AddChild(&silsilah, "", "Budi", 60, MALE, true);
     // silsilah.root->Pasangan = CreateNPartner("Ani", 58, FEMALE, true);
