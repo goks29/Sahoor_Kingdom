@@ -3,10 +3,6 @@
 /*Prosedur Utama Kerajaan*/
 void InsertLeluhur(NTree* tree) {
 
-    if(IsEmptyTree){
-        printf("Tree Belum Ada");
-        return;
-    }
     if(!IsEmptyTree){
         printf("Tree Sudah Memiliki root");
         return;
@@ -29,14 +25,16 @@ void InsertLeluhur(NTree* tree) {
         scanf("%d", &usia);
         printf("Masukkan gender (1 = Pria, 0 = Wanita): ");
         scanf("%d", &gender);
-        printf("Apakah masih hidup? (1 = Ya, 0 = Tidak): ");
-        scanf("%d", &isHidup);
         getchar();
 
         strcpy(newRoot->Identitas.info, NamaLeluhur);
         newRoot->Identitas.Usia = usia;
         newRoot->Identitas.Gender = (boolean)gender;
-        newRoot->Identitas.IsHidup = (boolean)isHidup;   
+        if(newRoot->Identitas.Usia > 110){
+            newRoot->Identitas.IsHidup = 0;
+        }else{
+            newRoot->Identitas.IsHidup = 1;
+        }
         
         printf("Apakah Input Sudah Benar(1 = ya, 2 = tidak) : ");
         scanf("%d",&prosespilih);
@@ -51,12 +49,50 @@ void InsertLeluhur(NTree* tree) {
     return;
 }
 
-void InsertPasangan(NTree* tree, char* KingName) {
+void InsertPasangan(NTree* tree, char* NamaNode) {
     
+    char NamaPasangan[50];
+    int umur;
+    boolean gender,IsHidup;
+
     if(tree == NULL || tree->root == NULL){
         printf("Tree Belum Ada atau Root Kosong");
         return;
     }
+
+    NkAdd TargetNode = SearchNode(tree->root,NamaNode);
+    if(TargetNode == NULL){
+        printf("%c Tidak Ditemukan Pada Tree",NamaNode);
+        return;
+    }
+
+    if(!TargetNode->Identitas.IsHidup){
+        printf("%c Sudah Meninggal masa mau dikawinin",NamaNode);
+        return;
+    }
+
+    if(TargetNode->Pasangan != NULL){
+        printf("%c sudah memiliki pasangan",NamaNode);
+        return;
+    }
+    
+    printf("Masukan Nama Pasangan dari %c : ",NamaNode);
+    scanf(" %[^\n]",NamaPasangan);
+    printf("Masukan Usia Pasangan %c : ",NamaNode);
+    scanf("%d",&umur);
+    if(TargetNode->Identitas.Gender == 1){
+        gender = 0;
+    }else{
+        gender = 1;
+    }
+
+    PartAdd pasangan = CreateNPartner(NamaPasangan,umur,gender,IsHidup);
+    if(pasangan == NULL){
+        printf("Pasangan gagal dialokasi");
+        return;
+    }
+
+    TargetNode->Pasangan = pasangan;
 
 }
 

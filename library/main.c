@@ -18,6 +18,6 @@ int main() {
 
     // AddChild(&silsilah, "Dika", "Nino", 10, MALE, true);
 
-    // PrintTree(silsilah);
+    PrintTree(silsilah);
     // return 0;
 }

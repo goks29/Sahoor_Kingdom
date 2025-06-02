@@ -9,7 +9,7 @@
 /*Prosedur Utama Kerajaan*/
 void InsertLeluhur(NTree* tree);
 
-void InsertPasangan(NTree* tree, char* KingName);
+void InsertPasangan(NTree* tree, char* NamaNode);
 
 void InsertMember(NTree* tree, char* parentName);
 
