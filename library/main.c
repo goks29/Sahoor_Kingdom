@@ -5,8 +5,6 @@ int main() {
 
     NTree silsilah;
     InitNbTree(&silsilah);
-
-
     // AddChild(&silsilah, "", "Budi", 60, MALE, true);
     // silsilah.root->Pasangan = CreateNPartner("Ani", 58, FEMALE, true);
 
@@ -20,6 +18,6 @@ int main() {
 
     // AddChild(&silsilah, "Dika", "Nino", 10, MALE, true);
 
-    PrintTree(silsilah);
+    // PrintTree(silsilah);
     // return 0;
 }

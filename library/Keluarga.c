@@ -2,6 +2,12 @@
 
 /*Prosedur Utama Kerajaan*/
 void InsertLeluhur(NTree* tree) {
+    FILE* file = fopen("db/Family.txt","a");
+
+    if (file == NULL) {
+        printf("File tidak dapat dibuka");
+        return;
+    }
 
     if(!IsEmptyTree){
         printf("Tree Sudah Memiliki root");
@@ -46,6 +52,11 @@ void InsertLeluhur(NTree* tree) {
     newRoot->Pasangan = NULL;
     tree->root = newRoot;   
     printf("Leluhur berhasil ditambahkan");
+    
+    if (file != NULL) {
+        fprintf(file, "NULL, %s, %d, %d",newRoot->Identitas.info,newRoot->Identitas.Usia,newRoot->Identitas.Gender);
+    }
+    fclose(file);
     return;
 }
 
@@ -54,6 +65,12 @@ void InsertPasangan(NTree* tree, char* NamaNode) {
     char NamaPasangan[50];
     int umur;
     boolean gender,IsHidup;
+    FILE* file = fopen("db/Family.txt","a");
+
+    if (file == NULL) {
+        printf("File tidak dapat dibuka");
+        return;
+    }
 
     if(tree == NULL || tree->root == NULL){
         printf("Tree Belum Ada atau Root Kosong");
@@ -93,7 +110,14 @@ void InsertPasangan(NTree* tree, char* NamaNode) {
     }
 
     TargetNode->Pasangan = pasangan;
+    system("cls");
+    printFromFile("assets/Rumah.txt");
+    printf("Pasangan berhasil ditambahkan dan berkeluarga");
 
+    if (file != NULL) {
+        fprintf(file, " -> %s, %d, %d", pasangan->Identitas.info,pasangan->Identitas.Usia,pasangan->Identitas.Gender);
+    }
+    fclose(file);
 }
 
 void InsertMember(NTree* tree, char* parentName) {
@@ -101,6 +125,12 @@ void InsertMember(NTree* tree, char* parentName) {
     char namaAnak[50];
     int umur,tempGender;
     boolean gender,IsHidup;
+    FILE* file = fopen("db/Family.txt", "a");
+
+    if (file == NULL) {
+        printf("File tidak dapat dibuka");
+        return;
+    }
 
     if(IsEmptyTree(tree)){
         printf("Root Belum Ada");
@@ -120,7 +150,11 @@ void InsertMember(NTree* tree, char* parentName) {
     }
 
     AddChild(tree,parentName,namaAnak,umur,gender,IsHidup);
-
+    
+    if (file != NULL) {
+        fprintf(file, "\n%s, %s, %d, %d",parentName,namaAnak,umur,gender);
+    }
+    fclose(file);
 }
 
 void CheckKoneksiKeluarga(NTree tree) {
