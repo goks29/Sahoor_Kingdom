@@ -123,8 +123,25 @@ void getDataFromFile(NTree* Tree) {
 }
 
 void printFromFile(const char* location) {
-
+    FILE *file;
+    char c;
+    
+    if (location == NULL) {
+        return;
+    }
+    
+    file = fopen(location, "rt");
+    if (file == NULL) {
+        return;
+    }
+    
+    while ((c = fgetc(file)) != EOF) {
+        printf("%c", c);
+    }
+    
+    fclose(file);
 }
+
 
 
 /*fungsi pengecekan*/
