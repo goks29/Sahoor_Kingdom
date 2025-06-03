@@ -109,13 +109,14 @@ void InsertPasangan(NTree* tree, char* NamaNode) {
         gender = 1;
     }
 
-    PartAdd pasangan = CreateNPartner(NamaPasangan,umur,gender,IsHidup);
+    NkAdd pasangan = CreateNode(NULL,NamaPasangan,umur,gender,IsHidup);
     if(pasangan == NULL){
         printf("Pasangan gagal dialokasi");
         return;
     }
 
     TargetNode->Pasangan = pasangan;
+    pasangan->Pasangan = TargetNode;
     system("cls");
     printFromFile("assets/Rumah.txt");
     printf("Pasangan berhasil ditambahkan dan berkeluarga");
