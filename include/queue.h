@@ -8,6 +8,7 @@ typedef struct QNode* Qaddress;
 
 typedef struct QNode {
     NkAdd data;
+    double bagianHarta;
     struct QNode* next;
 } QNode;
 
@@ -23,9 +24,9 @@ void initQueue(Queue* Q);
 
 boolean IsEmptyQueue(Queue* Q);
 
-void EnQueue (Queue* Q, NkAdd node);
+void EnQueue (Queue* Q, NkAdd node,double bagian);
 
-void DeQueue (Queue* Q, NkAdd node);
+void DeQueue (Queue* Q, NkAdd node,double bagian);
 
 
 

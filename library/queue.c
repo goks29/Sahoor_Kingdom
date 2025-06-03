@@ -13,10 +13,11 @@ boolean IsEmptyQueue(Queue* Q) {
     }
 }
 
-void EnQueue (Queue* Q, NkAdd node) {
+void EnQueue (Queue* Q, NkAdd node,double bagian) {
     QNode* NewNodeQ = (QNode*)malloc(sizeof(QNode));
     if (NewNodeQ != NULL) {
         NewNodeQ->data = node;
+        NewNodeQ->bagianHarta = bagian;
         NewNodeQ->next = NULL;
 
         if (IsEmptyQueue(Q)) {
@@ -30,7 +31,7 @@ void EnQueue (Queue* Q, NkAdd node) {
     }
 }
 
-void DeQueue (Queue* Q, NkAdd node) {
+void DeQueue (Queue* Q, NkAdd node,double bagian) {
     if (!IsEmptyQueue(Q)) {
         Qaddress temp = Q->front;
         node = temp->data;

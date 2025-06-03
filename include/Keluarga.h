@@ -17,7 +17,7 @@ void CheckHubunganKeluarga(NTree tree);
 
 void PrintSilsilah(NTree tree);
 
-void WarisHarta();
+void WarisHarta(NTree tree,char* parentName);
 
 void TimeSkip(NkAdd node, int year);
 

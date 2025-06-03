@@ -265,7 +265,207 @@ void PrintSilsilah(NTree tree) {
 
 }
 
-void WarisHarta() {
+void WarisHarta(NTree tree,char* parentName) {
+    
+    Queue queue;
+    Qaddress Q;
+    double pembagian;
+    initQueue(&queue);
+    int i,JmlSaudara,sdrLaki,sdrPerempuan;
+    NkAdd nodeSaudara;
+
+    JmlSaudara = 1;
+    NkAdd TargetNode = SearchNode(tree.root,parentName);
+    if(TargetNode == NULL){
+        printf("Nama %s tidak ditemukan pada tree",parentName);
+        return;
+    }
+
+    if(TargetNode->Pasangan != NULL && TargetNode->Pasangan->Identitas.IsHidup){
+        if(TargetNode->Pasangan->Identitas.Gender == 1){
+            if(TargetNode->FirstSon == NULL){  //bagian suami ketika tidak ada anak
+                pembagian = 1.0/2.0;
+                EnQueue(&queue,TargetNode->Pasangan,pembagian);
+            }else{
+                pembagian = 1.0/4.0; //bagian suami ketika ada anak
+                EnQueue(&queue,TargetNode->Pasangan,pembagian);
+            }
+        }else{
+            if(TargetNode->FirstSon == NULL){ //bagian istri ketika tidak ada anak
+                pembagian = 1.0/4.0;
+                EnQueue(&queue,TargetNode->Pasangan,pembagian);
+            }else{  
+                pembagian = 1.0/8.0; //bagian istri ketika ada anak
+                EnQueue(&queue,TargetNode->Pasangan,pembagian);
+            }            
+        }
+    }else if(TargetNode->Parents->Pasangan != NULL && TargetNode->Parents->Pasangan->Identitas.IsHidup){
+        if(TargetNode->Parents->Pasangan->Identitas.Gender == 0){
+            if(TargetNode->FirstSon != NULL){ //bagian ibu(diakses sebagai pasangan parents) ketika ada anak
+                pembagian = 1.0/6.0;
+                EnQueue(&queue,TargetNode->Parents->Pasangan,pembagian);
+            }else{
+                pembagian = 1.0/3.0; //bagian ibu(diakses sebagai pasangan parents) ketika tidak ada anak;
+                EnQueue(&queue,TargetNode->Parents->Pasangan,pembagian);
+            }            
+        }else{
+            pembagian = 1.0/6.0; //bagian ayah(diakses sebagai pasangan parents) 
+            EnQueue(&queue,TargetNode->Parents->Pasangan,pembagian);
+        }
+    }else if(TargetNode->Parents != NULL && TargetNode->Parents->Identitas.IsHidup){
+        if(TargetNode->Parents->Identitas.Gender == 0){
+            if(TargetNode->FirstSon != NULL){ //bagian ibu ketika ada anak
+                pembagian = 1.0/6.0;
+                EnQueue(&queue,TargetNode->Parents,pembagian);
+            }else{
+                pembagian = 1.0/3.0; //bagian ibu ketika tidak ada anak;
+                EnQueue(&queue,TargetNode->Parents,pembagian);
+            }            
+        }else{
+            pembagian = 1.0/6.0; //bagian ayah 
+            EnQueue(&queue,TargetNode->Parents,pembagian);
+        }        
+    }else if(TargetNode->Parents->FirstSon != NULL && TargetNode->FirstSon == NULL){ //perhitungan pada saudara node
+ 
+        JmlSaudara = 0;
+        sdrLaki = 0;
+        sdrPerempuan = 0;
+
+        nodeSaudara = TargetNode->Parents->FirstSon;
+        while(nodeSaudara->NextBrother != NULL){ //menghitung jumlah saudara node yang meninggal
+            nodeSaudara = nodeSaudara->NextBrother;
+            JmlSaudara++;
+        }
+        if(JmlSaudara > 1){ //perhitungan bagian apabila saudara yang meninggal lebih dari 1
+            nodeSaudara = TargetNode->Parents->FirstSon;
+            while(nodeSaudara->NextBrother != NULL){
+                if(nodeSaudara->Identitas.info == TargetNode->Identitas.info && nodeSaudara->Identitas.IsHidup){
+                    nodeSaudara = nodeSaudara->NextBrother;
+                }else if(nodeSaudara->Identitas.Gender = 0 && nodeSaudara->Identitas.IsHidup){
+                    sdrPerempuan++;
+                    nodeSaudara = nodeSaudara->NextBrother;
+                }else if(nodeSaudara->Identitas.IsHidup){
+                    sdrLaki++;
+                    nodeSaudara = nodeSaudara->NextBrother;
+                }
+            }
+            if(sdrPerempuan == 0){
+                nodeSaudara = TargetNode->Parents->FirstSon;
+                pembagian = (1.0/2.0)/sdrLaki;
+                while(nodeSaudara->NextBrother != NULL){
+                    if(nodeSaudara->Identitas.info == TargetNode->Identitas.info ){
+                        nodeSaudara = nodeSaudara->NextBrother;
+                    }else if(nodeSaudara->Identitas.IsHidup){
+                        EnQueue(&queue,nodeSaudara,pembagian);
+                        nodeSaudara = nodeSaudara->NextBrother;
+                    }
+                }
+            }else if(sdrLaki == 0){
+                nodeSaudara = TargetNode->Parents->FirstSon;
+                pembagian = (2.0/3.0)/sdrPerempuan;
+                while(nodeSaudara->NextBrother != NULL){
+                    if(nodeSaudara->Identitas.info == TargetNode->Identitas.info){
+                        nodeSaudara = nodeSaudara->NextBrother;
+                    }else if(nodeSaudara->Identitas.IsHidup){
+                        EnQueue(&queue,nodeSaudara,pembagian);
+                        nodeSaudara = nodeSaudara->NextBrother;
+                    }
+                }                
+            }else{
+                nodeSaudara = TargetNode->Parents->FirstSon;
+                while(nodeSaudara->NextBrother != NULL){
+                    if(nodeSaudara->Identitas.info == TargetNode->Identitas.info){
+                        nodeSaudara = nodeSaudara->NextBrother;
+                    }else if(nodeSaudara->Identitas.Gender = 1 && nodeSaudara->Identitas.IsHidup){
+                        pembagian = (1.0/2.0)/sdrLaki;
+                        EnQueue(&queue,nodeSaudara,pembagian);
+                    }else if(nodeSaudara->Identitas.IsHidup){
+                        pembagian = (1.0/4.0)/sdrPerempuan;
+                        EnQueue(&queue,nodeSaudara,pembagian);
+                    }
+                }
+            }
+        }else{
+            if(nodeSaudara->Identitas.Gender == 0 && nodeSaudara->Identitas.IsHidup){
+                pembagian = 1.0/2.0;
+                EnQueue(&queue,nodeSaudara,pembagian);
+            }else if(nodeSaudara->Identitas.IsHidup){
+                pembagian = 1.0/2.0;
+                EnQueue(&queue,nodeSaudara,pembagian);
+            }
+        }
+    }else if(TargetNode->FirstSon != NULL){ //perhitungan pada anak node
+
+        JmlSaudara = 0;
+        sdrLaki = 0;
+        sdrPerempuan = 0;
+
+        nodeSaudara = TargetNode->FirstSon;
+        while(nodeSaudara->NextBrother != NULL){ //menghitung jumlah saudara node yang meninggal
+            nodeSaudara = nodeSaudara->NextBrother;
+            JmlSaudara++;
+        }
+        if(JmlSaudara > 1){ //perhitungan bagian apabila saudara yang meninggal lebih dari 1
+            nodeSaudara = TargetNode->FirstSon;
+            while(nodeSaudara->NextBrother != NULL){
+                if(nodeSaudara->Identitas.info == TargetNode->Identitas.info){
+                    nodeSaudara = nodeSaudara->NextBrother;
+                }else if(nodeSaudara->Identitas.Gender = 0 && nodeSaudara->Identitas.IsHidup){
+                    sdrPerempuan++;
+                    nodeSaudara = nodeSaudara->NextBrother;
+                }else if(nodeSaudara->Identitas.IsHidup){
+                    sdrLaki++;
+                    nodeSaudara = nodeSaudara->NextBrother;
+                }
+            }
+            if(sdrPerempuan == 0){
+                nodeSaudara = TargetNode->FirstSon;
+                pembagian = (1.0/2.0)/sdrLaki;
+                while(nodeSaudara->NextBrother != NULL){
+                    if(nodeSaudara->Identitas.info == TargetNode->Identitas.info){
+                        nodeSaudara = nodeSaudara->NextBrother;
+                    }else{
+                        EnQueue(&queue,nodeSaudara,pembagian);
+                        nodeSaudara = nodeSaudara->NextBrother;
+                    }
+                }
+            }else if(sdrLaki == 0){
+                nodeSaudara = TargetNode->FirstSon;
+                pembagian = (2.0/3.0)/sdrPerempuan;
+                while(nodeSaudara->NextBrother != NULL){
+                    if(nodeSaudara->Identitas.info == TargetNode->Identitas.info){
+                        nodeSaudara = nodeSaudara->NextBrother;
+                    }else{
+                        EnQueue(&queue,nodeSaudara,pembagian);
+                        nodeSaudara = nodeSaudara->NextBrother;
+                    }
+                }                
+            }else{
+                nodeSaudara = TargetNode->FirstSon;
+                while(nodeSaudara->NextBrother != NULL){
+                    if(nodeSaudara->Identitas.info == TargetNode->Identitas.info){
+                        nodeSaudara = nodeSaudara->NextBrother;
+                    }else if(nodeSaudara->Identitas.Gender = 1){
+                        pembagian = (1.0/2.0)/sdrLaki;
+                        EnQueue(&queue,nodeSaudara,pembagian);
+                    }else{
+                        pembagian = (1.0/4.0)/sdrPerempuan;
+                        EnQueue(&queue,nodeSaudara,pembagian);
+                    }
+                }
+            }
+        }else{
+            if(nodeSaudara->Identitas.Gender == 0){
+                pembagian = 1.0/2.0;
+                EnQueue(&queue,nodeSaudara,pembagian);
+            }else{
+                pembagian = 1.0/2.0;
+                EnQueue(&queue,nodeSaudara,pembagian);
+            }
+        }        
+    }
+
+    Q = queue.front;
 
 }
 
