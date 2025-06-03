@@ -13,7 +13,7 @@ void InsertPasangan(NTree* tree, char* NamaNode);
 
 void InsertMember(NTree* tree, char* parentName);
 
-void CheckKoneksiKeluarga(NTree tree);
+void CheckHubunganKeluarga(NTree tree);
 
 void PrintSilsilah(NTree tree);
 

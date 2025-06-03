@@ -37,7 +37,7 @@ int main() {
                 InsertMember(&tree, nama);
                 break;
             case 4:
-                CheckKoneksiKeluarga(tree);
+                CheckHubunganKeluarga(tree);
                 break;
             case 0:
                 printf("Terima kasih!\n");

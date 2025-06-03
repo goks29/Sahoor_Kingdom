@@ -1,0 +1,2 @@
+NULL, gok, 29, 1 -> syahrini, 19, 0
+gok, emir, 1, 1NULL, gok, 29, 1 -> sumin, 28, 0NULL, gok, 29, 1 -> sumin, 19, 0NULL, gok, 29, 1 -> sumin, 19, 0

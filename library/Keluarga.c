@@ -162,7 +162,7 @@ void InsertMember(NTree* tree, char* parentName) {
     fclose(file);
 }
 
-void CheckKoneksiKeluarga(NTree tree) {
+void CheckHubunganKeluarga(NTree tree) {
     Stack P1, P2;
     NkAdd NPerson1, NPerson2;
     NkAdd Connection1, Connection2;
@@ -187,8 +187,8 @@ void CheckKoneksiKeluarga(NTree tree) {
     }
 
     // Pasangan langsung
-    if ((NPerson1->Pasangan && NPerson1->Pasangan == NPerson2) ||
-        (NPerson2->Pasangan && NPerson2->Pasangan == NPerson1)) {
+    if ((NPerson1->Pasangan && strcmp(NPerson1->Pasangan->Identitas.info, nameP2) == 0) ||
+        (NPerson2->Pasangan && strcmp(NPerson2->Pasangan->Identitas.info, nameP1) == 0)) {
         printf("\n%s dan %s adalah pasangan langsung.\n", nameP1, nameP2);
         printf("Hubungan: Pasangan\n");
         return;
