@@ -12,7 +12,7 @@ boolean IsEmptyStack(Stack* S) {
     }
 }
 
-void Push(Stack* S, StackItem Node) {
+void Push(Stack* S, NkAdd Node) {
     StackNode* newNodeS = (StackNode*)malloc(sizeof(StackNode));
     if (newNodeS != NULL) {
         newNodeS->data = Node;
@@ -21,8 +21,8 @@ void Push(Stack* S, StackItem Node) {
     }
 }
 
-StackItem Pop(Stack* S) {
-    StackItem item;
+NkAdd Pop(Stack* S) {
+    NkAdd item;
     if (!IsEmptyStack(S)) {
         StackNode* temp = S->top;
         item = temp->data;
@@ -30,7 +30,7 @@ StackItem Pop(Stack* S) {
         free(temp);
         return item;
     } else {
-        item.data = NULL;
+        item = NULL;
         return item;
     }
 }

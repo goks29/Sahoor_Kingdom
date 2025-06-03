@@ -1,6 +1,6 @@
 #include "Keluarga.h"
 
-/*Prosedur Utama Kerajaan*/
+/*Prosedur Utama Keluarga*/
 void InsertLeluhur(NTree* tree) {
     FILE* file = fopen("db/Family.txt","a");
 
@@ -83,7 +83,7 @@ void InsertPasangan(NTree* tree, char* NamaNode) {
         return;
     }
 
-    if(!TargetNode->Identitas.IsHidup){
+    if(TargetNode->Identitas.IsHidup == 0){
         printf("%c Sudah Meninggal masa mau dikawinin",NamaNode);
         return;
     }
@@ -97,6 +97,12 @@ void InsertPasangan(NTree* tree, char* NamaNode) {
     scanf(" %[^\n]",NamaPasangan);
     printf("Masukan Usia Pasangan %s : ",NamaNode);
     scanf("%d",&umur);
+    if (umur > 110) {
+        IsHidup = 0;
+    } else {
+        IsHidup = 1;
+    }
+    
     if(TargetNode->Identitas.Gender == 1){
         gender = 0;
     }else{
@@ -121,10 +127,9 @@ void InsertPasangan(NTree* tree, char* NamaNode) {
 }
 
 void InsertMember(NTree* tree, char* parentName) {
-    
     char namaAnak[50];
     int umur,tempGender;
-    boolean gender,IsHidup;
+    boolean gender,IsHidup = 1;
     FILE* file = fopen("db/Family.txt", "a");
 
     if (file == NULL) {
@@ -158,8 +163,102 @@ void InsertMember(NTree* tree, char* parentName) {
 }
 
 void CheckKoneksiKeluarga(NTree tree) {
+    Stack P1, P2;
+    NkAdd NPerson1, NPerson2;
+    NkAdd Connection1, Connection2;
+    char nameP1[50], nameP2[50];
+    int gen1 = 0, gen2 = 0;
 
+    InitStack(&P1);
+    InitStack(&P2);
+
+    // Input nama node
+    printf("Masukan nama node yang akan dibandingkan (1) : ");
+    scanf(" %[^\n]", nameP1);
+    NPerson1 = SearchNode(tree.root, nameP1);
+
+    printf("Masukan nama node yang akan dibandingkan (2) : ");
+    scanf(" %[^\n]", nameP2);
+    NPerson2 = SearchNode(tree.root, nameP2);
+
+    if (NPerson1 == NULL || NPerson2 == NULL) {
+        printf("Salah satu node tidak ditemukan.\n");
+        return;
+    }
+
+    // Pasangan langsung
+    if ((NPerson1->Pasangan && NPerson1->Pasangan == NPerson2) ||
+        (NPerson2->Pasangan && NPerson2->Pasangan == NPerson1)) {
+        printf("\n%s dan %s adalah pasangan langsung.\n", nameP1, nameP2);
+        printf("Hubungan: Pasangan\n");
+        return;
+    }
+
+    // Isi stack untuk penelusuran ke leluhur
+    NkAdd temp1 = NPerson1;
+    NkAdd temp2 = NPerson2;
+
+    while (temp1 != NULL) {
+        Push(&P1, temp1);
+        temp1 = temp1->Parents;
+    }
+
+    while (temp2 != NULL) {
+        Push(&P2, temp2);
+        temp2 = temp2->Parents;
+    }
+
+    NkAdd LastCommon = NULL;
+    while (!IsEmptyStack(&P1) && !IsEmptyStack(&P2)) {
+        Connection1 = Pop(&P1);
+        Connection2 = Pop(&P2);
+
+        if (Connection1 == Connection2) {
+            LastCommon = Connection1;
+        } else {
+            break;
+        }
+    }
+
+    // Hitung sisa untuk generasi
+    while (!IsEmptyStack(&P1)) {
+        Pop(&P1);
+        gen1++;
+    }
+    while (!IsEmptyStack(&P2)) {
+        Pop(&P2);
+        gen2++;
+    }
+
+    // Cetak hasil
+    if (LastCommon != NULL) {
+        printf("\nLeluhur terdekat bersama: %s\n", LastCommon->Identitas.info);
+    } else {
+        printf("\nTidak ditemukan leluhur bersama.\n");
+    }
+
+    printf("Jarak generasi dari %s ke leluhur: %d\n", nameP1, gen1);
+    printf("Jarak generasi dari %s ke leluhur: %d\n", nameP2, gen2);
+
+    // Tentukan hubungan
+    printf("Hubungan antara %s dan %s: ", nameP1, nameP2);
+    if (gen1 == 0 && gen2 == 1) {
+        printf("Orang tua dan anak.\n");
+    } else if (gen1 == 1 && gen2 == 0) {
+        printf("Anak dan orang tua.\n");
+    } else if (gen1 == 0 && gen2 == 2) {
+        printf("Kakek/nenek dan cucu.\n");
+    } else if (gen1 == 2 && gen2 == 0) {
+        printf("Cucu dan kakek/nenek.\n");
+    } else if (gen1 == 1 && gen2 == 1) {
+        printf("Saudara kandung.\n");
+    } else if (gen1 == gen2) {
+        printf("Sepupu atau kerabat satu generasi.\n");
+    } else {
+        printf("Kerabat jauh.\n");
+    }
 }
+
 
 void PrintSilsilah(NTree tree) {
 

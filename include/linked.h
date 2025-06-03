@@ -23,6 +23,9 @@ typedef struct Info_Orang{
 
 typedef struct Partner {
     Info Identitas;
+    NkAdd FirstSon;
+    NkAdd NextBrother;
+    NkAdd Parents;
 }NkPartner;
 
 /*NODE*/

@@ -1,23 +1,52 @@
 #include <stdio.h>
-#include "keluarga.h"
+#include <stdlib.h>
+#include "Keluarga.h" // pastikan file header ini sesuai dan lengkap
 
 int main() {
+    NTree tree;
+    
+    // Inisialisasi tree kosong
+    InitNbTree(&tree); // Pastikan InitTree ada dan sesuai
 
-    NTree silsilah;
-    InitNbTree(&silsilah);
-    // AddChild(&silsilah, "", "Budi", 60, MALE, true);
-    // silsilah.root->Pasangan = CreateNPartner("Ani", 58, FEMALE, true);
+    int pilihan;
+    char nama[50];
 
-    // AddChild(&silsilah, "Budi", "Rina", 35, FEMALE, true);
-    // AddChild(&silsilah, "Budi", "Dika", 32, MALE, true);
+    do {
+        printf("\n==== Menu Silsilah Keluarga ====\n");
+        printf("1. Tambah Leluhur\n");
+        printf("2. Tambah Pasangan\n");
+        printf("3. Tambah Anak\n");
+        printf("4. Cek Koneksi Keluarga\n");
+        printf("0. Keluar\n");
+        printf("Pilihan: ");
+        scanf("%d", &pilihan);
+        getchar(); // bersihkan newline
 
-    // NkAdd dika = SearchNode(silsilah.root, "Dika");
-    // if (dika != NULL) {
-    //     dika->Pasangan = CreateNPartner("Sari", 30, FEMALE, true);
-    // }
+        switch(pilihan) {
+            case 1:
+                InsertLeluhur(&tree);
+                break;
+            case 2:
+                printf("Masukkan nama yang ingin diberi pasangan: ");
+                scanf(" %[^\n]", nama);
+                InsertPasangan(&tree, nama);
+                break;
+            case 3:
+                printf("Masukkan nama orang tua: ");
+                scanf(" %[^\n]", nama);
+                InsertMember(&tree, nama);
+                break;
+            case 4:
+                CheckKoneksiKeluarga(tree);
+                break;
+            case 0:
+                printf("Terima kasih!\n");
+                break;
+            default:
+                printf("Pilihan tidak valid.\n");
+                break;
+        }
+    } while (pilihan != 0);
 
-    // AddChild(&silsilah, "Dika", "Nino", 10, MALE, true);
-
-    // PrintTree(silsilah);
-    // return 0;
+    return 0;
 }
