@@ -13,6 +13,8 @@ void InsertPasangan(NTree* tree, char* NamaNode);
 
 void InsertMember(NTree* tree, char* parentName);
 
+void InsertKeluargaPasangan (NTree* tree, char* PartnerName);
+
 void CheckHubunganKeluarga(NTree tree);
 
 void PrintSilsilah(NTree tree);
@@ -27,11 +29,9 @@ void getDataFromFile(NTree* Tree);
 
 void printFromFile(const char* location);
 
-
 /*fungsi pengecekan*/
 boolean HasPartner(NkAdd node);
 
-boolean IsLeluhurExist(NTree* tree);
 
 
 

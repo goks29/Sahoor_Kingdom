@@ -6,8 +6,12 @@ NkAdd CreateNode(NkAdd parents, const char* name, int usia, boolean gender, bool
     if (newnode != NULL) {
         strcpy(newnode->Identitas.info, name);
         newnode->Identitas.Usia = usia;
-        newnode->Identitas.Gender = gender;
-        newnode->Identitas.IsHidup = hidup;
+        newnode->Identitas.Gender = (boolean)gender;
+        if(newnode->Identitas.Usia > 110){
+            newnode->Identitas.IsHidup = 0;
+        }else{
+            newnode->Identitas.IsHidup = 1;
+        }
         newnode->Pasangan = NULL;
         newnode->Parents = parents;
         newnode->FirstSon = NULL;

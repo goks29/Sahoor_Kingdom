@@ -9,7 +9,7 @@ boolean IsEmptyTree (NTree* T){
 }
 
 void AddChild (NTree* T, const char* parents, infotype name, int usia, boolean gender, boolean hidup) {
-    int i=1;
+    int i=2;
     if (IsEmptyTree(T)) {
         T->root = CreateNode(NULL, name, usia, gender, hidup);
         return;
@@ -21,7 +21,10 @@ void AddChild (NTree* T, const char* parents, infotype name, int usia, boolean g
 
         if (current->FirstSon == NULL) {
             current->FirstSon = newChild;
-            printf("%s merupakan first son dari %s\n",name,parents);
+            if (current->Pasangan != NULL) {
+                current->Pasangan->FirstSon = newChild;
+            }
+            printf("%s merupakan first son dari %s dan %s\n",name,parents,current->Pasangan->Identitas.info);
         } else {
             NkAdd temp = current->FirstSon;
             while (temp->NextBrother != NULL) {
@@ -29,7 +32,7 @@ void AddChild (NTree* T, const char* parents, infotype name, int usia, boolean g
                 i++;
             }
             temp->NextBrother = newChild;
-            printf("%s merupakan anak ke-%d dari %s\n\n",name,i,parents);
+            printf("%s merupakan anak ke-%d dari %s dan %s\n\n",name,i,current->Identitas.info,current->Pasangan->Identitas.info);
         } 
     } else {
         printf("Parents '%s' tidak ditemukan atau node yang dicari belum menikah", parents);
@@ -46,7 +49,7 @@ NkAdd SearchNode (NkAdd curNode, const char* name) {
     }
     
     if (curNode->Pasangan != NULL && strcmp(curNode->Pasangan->Identitas.info,name) == 0) {
-        return curNode->Pasangan;
+        return curNode;
     }
 
     NkAdd found = SearchNode(curNode->FirstSon,name);

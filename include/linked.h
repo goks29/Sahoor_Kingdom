@@ -29,7 +29,6 @@ typedef struct Node {
     NkAdd Pasangan;
 }NodeK;
 
-
 /*FUNGSI*/
 
 NkAdd CreateNode(NkAdd parents, const char* name, int usia, boolean gender, boolean hidup);

@@ -17,6 +17,7 @@ int main() {
         printf("2. Tambah Pasangan\n");
         printf("3. Tambah Anak\n");
         printf("4. Cek Koneksi Keluarga\n");
+        printf("5. Tambah Keluarga Pasangan\n");
         printf("0. Keluar\n");
         printf("Pilihan: ");
         scanf("%d", &pilihan);
@@ -39,6 +40,11 @@ int main() {
             case 4:
                 CheckHubunganKeluarga(tree);
                 break;
+            case 5:
+                printf("Masukan nama pasangan yang ingin diisi data keluarga : ");
+                scanf(" %[^\n]", nama);
+                InsertKeluargaPasangan(&tree, nama);
+                break;    
             case 0:
                 printf("Terima kasih!\n");
                 break;

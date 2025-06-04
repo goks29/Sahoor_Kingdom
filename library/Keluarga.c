@@ -31,25 +31,12 @@ void InsertLeluhur(NTree* tree) {
         scanf("%d", &usia);
         printf("Masukkan gender (1 = Pria, 0 = Wanita): ");
         scanf("%d", &gender);
-        getchar();
-
-        strcpy(newRoot->Identitas.info, NamaLeluhur);
-        newRoot->Identitas.Usia = usia;
-        newRoot->Identitas.Gender = (boolean)gender;
-        if(newRoot->Identitas.Usia > 110){
-            newRoot->Identitas.IsHidup = 0;
-        }else{
-            newRoot->Identitas.IsHidup = 1;
-        }
-        
+        getchar();   
         printf("Apakah Input Sudah Benar(1 = ya, 2 = tidak) : ");
         scanf("%d",&prosespilih);
-    } while (prosespilih == 2);
+        } while (prosespilih == 2);
     
-    newRoot->FirstSon = NULL;
-    newRoot->NextBrother = NULL;
-    newRoot->Parents = NULL;
-    newRoot->Pasangan = NULL;
+    newRoot = CreateNode(NULL,NamaLeluhur,usia,gender,isHidup);
     tree->root = newRoot;   
     printf("Leluhur berhasil ditambahkan");
     
@@ -79,12 +66,12 @@ void InsertPasangan(NTree* tree, char* NamaNode) {
 
     NkAdd TargetNode = SearchNode(tree->root,NamaNode);
     if(TargetNode == NULL){
-        printf("%c Tidak Ditemukan Pada Tree",NamaNode);
+        printf("%s Tidak Ditemukan Pada Tree",NamaNode);
         return;
     }
 
     if(TargetNode->Identitas.IsHidup == 0){
-        printf("%c Sudah Meninggal masa mau dikawinin",NamaNode);
+        printf("%s Sudah Meninggal masa mau dikawinin",NamaNode);
         return;
     }
 
@@ -117,6 +104,7 @@ void InsertPasangan(NTree* tree, char* NamaNode) {
 
     TargetNode->Pasangan = pasangan;
     pasangan->Pasangan = TargetNode;
+    
     system("cls");
     printFromFile("assets/Rumah.txt");
     printf("Pasangan berhasil ditambahkan dan berkeluarga");
@@ -161,6 +149,93 @@ void InsertMember(NTree* tree, char* parentName) {
         fprintf(file, "\n%s, %s, %d, %d",parentName,namaAnak,umur,gender);
     }
     fclose(file);
+}
+
+void InsertKeluargaPasangan (NTree* tree, char* PartnerName) {
+    NkAdd NodePasangan;
+
+    if(tree == NULL || tree->root == NULL){
+        printf("Tree Belum Ada atau Root Kosong");
+        return;
+    }
+
+    NodePasangan = SearchNode(tree->root, PartnerName);
+
+    if (NodePasangan->Pasangan == NULL) {
+        printf("Node yang kamu cari belum mempunyai pasangan");
+        return;
+    } else {
+        NkAdd NodeParents;
+        char NamaParents[50];
+        int usia, gender = 1, isHidup,prosespilih;
+
+        //memasukan parent dari pasangan
+        printf("Masukan nama parents dari pasangan (ayah) : ");
+        scanf(" %[^\n]", NamaParents);
+        getchar();
+        printf("Masukkan usia: ");
+        scanf("%d", &usia);
+        printf("Apakah mash hidup ? (1 = Hidup, 0 = Tidak)");
+        scanf("%d",&isHidup);
+        getchar();
+        NodeParents = CreateNode(NULL,NamaParents,usia,gender,isHidup);
+
+        //memasukan pasangan dari parent
+        char NamaPasanganParents[50];
+        int usiaPasangan, genderPasangan = 0, isHidupPasangan;
+
+        printf("Masukan nama pasangan dari parent (ibu) : ");
+        scanf(" %[^\n]", NamaPasanganParents);
+        getchar();
+        printf("Masukkan usia: ");
+        scanf("%d", &usiaPasangan);
+        printf("Apakah mash hidup ? (1 = Hidup, 0 = Tidak)");
+        scanf("%d",&isHidupPasangan);
+        getchar();
+        NkAdd PasanganParents = CreateNode(NULL, NamaPasanganParents,usiaPasangan, genderPasangan, isHidupPasangan);
+        NodeParents->Pasangan = PasanganParents;
+        PasanganParents->Pasangan = NodeParents;
+
+        NodePasangan->Pasangan->Parents = NodeParents;
+
+        NodeParents->FirstSon = NodePasangan->Pasangan;
+
+        //memasukan saudara kandung dari pasangan
+        int jumlahSaudara;
+        printf("Berapa jumlahh saudara dari pasangan? (max 2) : ");
+        scanf("%d",&jumlahSaudara);
+        getchar();
+        if (jumlahSaudara > 2) {
+            printf("Maksimal hanya 2!, Menambahkan 2 saudara");
+            jumlahSaudara = 2;
+        }
+
+        if (jumlahSaudara > 0) {
+            NkAdd SaudaraTerakhir = NodePasangan->Pasangan;
+        
+            for (int i = 0; i < jumlahSaudara; i++) {
+                char namaSaudara[50];
+                int usiaSau, genderSau, hidupSau;
+                printf("Masukan nama saudara ke-%d : ", i+1);
+                scanf(" %[^\n]", namaSaudara);
+                getchar();
+                printf("Masukkan usia: ");
+                scanf("%d", &usiaSau);
+                printf("Masukkan gender (1 = Pria, 0 = Wanita): ");
+                scanf("%d", &genderSau);
+                getchar();
+                printf("Apakah mash hidup ? (1 = Hidup, 0 = Tidak)");
+                scanf("%d",&hidupSau);
+                getchar();
+
+                NkAdd Saudara = CreateNode(NodePasangan->Pasangan->Parents,namaSaudara,usiaSau,genderSau,hidupSau);
+                SaudaraTerakhir->NextBrother = Saudara;
+                SaudaraTerakhir = Saudara;
+            }
+        } else {
+            printf("Tidak menambahkan saudara");
+        }
+    }
 }
 
 void CheckHubunganKeluarga(NTree tree) {
