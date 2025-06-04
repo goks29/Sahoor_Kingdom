@@ -242,8 +242,9 @@ void CheckHubunganKeluarga(NTree tree) {
     Stack P1, P2;
     NkAdd NPerson1, NPerson2;
     NkAdd Connection1, Connection2;
+    NkAdd visited[1000];
     char nameP1[50], nameP2[50];
-    int gen1 = 0, gen2 = 0;
+    int gen1 = 0, gen2 = 0, visitedCount = 0;
 
     InitStack(&P1);
     InitStack(&P2);
@@ -251,11 +252,13 @@ void CheckHubunganKeluarga(NTree tree) {
     // Input nama node
     printf("Masukan nama node yang akan dibandingkan (1) : ");
     scanf(" %[^\n]", nameP1);
-    NPerson1 = SearchNode(tree.root, nameP1);
+    NPerson1 = SearchNodeUniversal(tree.root, nameP1, visited, &visitedCount);
+
+    visitedCount = 0;
 
     printf("Masukan nama node yang akan dibandingkan (2) : ");
     scanf(" %[^\n]", nameP2);
-    NPerson2 = SearchNode(tree.root, nameP2);
+    NPerson2 = SearchNodeUniversal(tree.root, nameP2, visited, &visitedCount);
 
     if (NPerson1 == NULL || NPerson2 == NULL) {
         printf("Salah satu node tidak ditemukan.\n");

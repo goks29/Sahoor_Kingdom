@@ -61,6 +61,49 @@ NkAdd SearchNode (NkAdd curNode, const char* name) {
     
 }
 
+int isVisited(NkAdd* visited, int count, NkAdd node) {
+    for (int i = 0; i < count; i++) {
+        if (visited[i] == node) return 1;
+    }
+    return 0;
+}
+
+NkAdd SearchNodeUniversal(NkAdd curNode, const char* name, NkAdd* visited, int* count) {
+    if (curNode == NULL || isVisited(visited,*count,curNode)) {
+        return NULL;
+    }
+
+    visited[(*count)++] = curNode;
+
+    if (strcmp(curNode->Identitas.info,name) == 0 ) {
+        return curNode;
+    }
+
+    NkAdd found = NULL;
+
+    
+    found = SearchNodeUniversal(curNode->Pasangan,name,visited,count);
+    if (found) {
+        return found;
+    }
+
+    found = SearchNodeUniversal(curNode->FirstSon,name,visited,count);
+    if (found) {
+        return found;
+    }
+
+    found = SearchNodeUniversal(curNode->NextBrother,name,visited,count);
+    if (found) {
+        return found;
+    }
+    
+    found = SearchNodeUniversal(curNode->Parents,name,visited,count);
+    if (found) {
+        return found;
+    }
+
+    return NULL;
+}
 
 void PrintTreeRek(NkAdd node, int level) {
     if (node == NULL) return;

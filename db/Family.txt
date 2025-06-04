@@ -1,0 +1,6 @@
+NULL, gok, 29, 1 -> sumin, 24, 0
+gok, goklas, 1, 1NULL, gok, 29, 1 -> sumin, 24, 0
+gok, goklas, 1, 1NULL, gok, 29, 1 -> sumin, 24, 0
+gok, goklas, 10, 1NULL, gok, 29, 1 -> sumin, 24, 0
+gok, goklas, 10, 1NULL, gok, 29, 1 -> sumin, 20, 0
+gok, goklas, 10, 1

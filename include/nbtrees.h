@@ -20,6 +20,10 @@ void AddChild (NTree* T, const char* parents, infotype name, int usia, boolean g
 
 NkAdd SearchNode (NkAdd curNode, const char* name);
 
+int isVisited(NkAdd* visited, int count, NkAdd node);
+
+NkAdd SearchNodeUniversal(NkAdd curNode, const char* name, NkAdd* visited, int* count);
+
 void PrintTreeRek(NkAdd node, int level);
 
 void PrintTree (NTree T);
