@@ -26,7 +26,7 @@ boolean IsEmptyQueue(Queue* Q);
 
 void EnQueue (Queue* Q, NkAdd node,double bagian);
 
-void DeQueue (Queue* Q, NkAdd node,double bagian);
+void DeQueue (Queue* Q, NkAdd node);
 
 
 

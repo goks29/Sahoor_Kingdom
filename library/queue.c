@@ -23,15 +23,14 @@ void EnQueue (Queue* Q, NkAdd node,double bagian) {
         if (IsEmptyQueue(Q)) {
             Q->front = NewNodeQ;
             Q->rear = NewNodeQ;
-        }
-
-        if (!IsEmptyQueue(Q)) {
+        }else{
             Q->rear->next = NewNodeQ;
+            Q->rear = NewNodeQ;
         }
     }
 }
 
-void DeQueue (Queue* Q, NkAdd node,double bagian) {
+void DeQueue (Queue* Q, NkAdd node) {
     if (!IsEmptyQueue(Q)) {
         Qaddress temp = Q->front;
         node = temp->data;

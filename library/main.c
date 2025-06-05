@@ -9,7 +9,7 @@ int main() {
     InitNbTree(&tree); // Pastikan InitTree ada dan sesuai
 
     int pilihan;
-    char nama[50];
+    char nama[50],NodeMati[50];
 
     do {
         printf("\n==== Menu Silsilah Keluarga ====\n");
@@ -41,10 +41,16 @@ int main() {
                 CheckHubunganKeluarga(tree);
                 break;
             case 5:
+<<<<<<< Updated upstream
                 printf("Masukan nama pasangan yang ingin diisi data keluarga : ");
                 scanf(" %[^\n]", nama);
                 InsertKeluargaPasangan(&tree, nama);
                 break;    
+=======
+                printf("masukan nama node yang meninggal : ");
+                scanf(" %[^\n]",NodeMati);
+                WarisHarta(tree,NodeMati);
+>>>>>>> Stashed changes
             case 0:
                 printf("Terima kasih!\n");
                 break;
