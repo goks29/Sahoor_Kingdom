@@ -41,7 +41,7 @@ void InsertLeluhur(NTree* tree) {
     printf("Leluhur berhasil ditambahkan");
     
     if (file != NULL) {
-        fprintf(file, "NULL, %s, %d, %d",newRoot->Identitas.info,newRoot->Identitas.Usia,newRoot->Identitas.Gender);
+        fprintf(file, "NULL, %s, %d, %d",newRoot->Identitas.Nama,newRoot->Identitas.Usia,newRoot->Identitas.Gender);
     }
     fclose(file);
     return;
@@ -66,24 +66,32 @@ void InsertPasangan(NTree* tree, char* NamaNode) {
 
     NkAdd TargetNode = SearchNode(tree->root,NamaNode);
     if(TargetNode == NULL){
-        printf("%s Tidak Ditemukan Pada Tree",NamaNode);
+        printf("%s Tidak Ditemukan Pada Tree.\n",NamaNode);
+        getch();
         return;
     }
 
     if(TargetNode->Identitas.IsHidup == 0){
-        printf("%s Sudah Meninggal masa mau dikawinin",NamaNode);
+        printf("%s Sudah Meninggal. Tidak bisa di nikahkan.\n",NamaNode);
+        getch();
         return;
     }
 
     if(TargetNode->Pasangan != NULL){
-        printf("%s sudah memiliki pasangan",NamaNode);
+        printf("%s Sudah memiliki pasangan.\n",NamaNode);
+        getch();
         return;
     }
 
     printf("Masukan Nama Pasangan dari %s : ",NamaNode);
     scanf(" %[^\n]",NamaPasangan);
-    printf("Masukan Usia Pasangan %s : ",NamaNode);
+    printf("Masukan Usia %s : ",NamaPasangan);
     scanf("%d",&umur);
+    if (umur < 19) {
+        printf("Tidak bisa menikah ! Belum berumur 18 tahun.\n");
+        getch();
+        return;
+    }
     if (umur > 110) {
         IsHidup = 0;
     } else {
@@ -106,11 +114,10 @@ void InsertPasangan(NTree* tree, char* NamaNode) {
     pasangan->Pasangan = TargetNode;
     
     system("cls");
-    printFromFile("assets/Rumah.txt");
     printf("Pasangan berhasil ditambahkan dan berkeluarga");
 
     if (file != NULL) {
-        fprintf(file, " -> %s, %d, %d", pasangan->Identitas.info,pasangan->Identitas.Usia,pasangan->Identitas.Gender);
+        fprintf(file, " -> %s, %d, %d", pasangan->Identitas.Nama,pasangan->Identitas.Usia,pasangan->Identitas.Gender);
     }
     fclose(file);
 }
@@ -127,15 +134,30 @@ void InsertMember(NTree* tree, char* parentName) {
     }
 
     if(IsEmptyTree(tree)){
-        printf("Root Belum Ada");
+        printf("\nTree kosong. Tidak bisa menambahkan anak.\n");
         return;
     }
 
-    printf("Masukan Nama Anak dari %s yang Akan Dimasukan : ",parentName);
+    NkAdd current = SearchNode(tree->root,parentName);
+
+    if (current == NULL) {
+        printf("\nParents '%s' tidak ditemukan.\n",parentName);
+        getch();
+        return;
+    }
+
+    if (current->Pasangan == NULL) {
+        printf("\nParents '%s' belum menikah. Tidak bisa menambahkan anak.\n",parentName);
+        getch();
+        return;
+    }
+
+    printf("Masukan Nama Anak dari %s : ",parentName);
     scanf(" %[^\n]",namaAnak);
-    printf("Masukan Usia %s : ",namaAnak);
+    int range = ValidasiUsiaOrtu(current);
+    printf("Masukan Usia %s (range 1 - %d) : ",namaAnak,range);
     scanf("%d",&umur);
-    printf("Pilih Gender %s (0 = Perempuan, 1 = Laki-laki) : ");
+    printf("Pilih Gender %s (0 = Perempuan, 1 = Laki-laki) : ",namaAnak);
     scanf("%d",&tempGender);
     if(tempGender == 0){
         gender = 0;
@@ -143,7 +165,7 @@ void InsertMember(NTree* tree, char* parentName) {
         gender = 1;
     }
 
-    AddChild(tree,parentName,namaAnak,umur,gender,IsHidup);
+    AddChild(tree, current, parentName, namaAnak, umur, gender, IsHidup);
     
     if (file != NULL) {
         fprintf(file, "\n%s, %s, %d, %d",parentName,namaAnak,umur,gender);
@@ -161,81 +183,105 @@ void InsertKeluargaPasangan (NTree* tree, char* PartnerName) {
 
     NodePasangan = SearchNode(tree->root, PartnerName);
 
-    if (NodePasangan->Pasangan == NULL) {
-        printf("Node yang kamu cari belum mempunyai pasangan");
+    
+
+    if (NodePasangan == NULL) {
+        printf("Node yang '%s' tidak ada dalam silsilah keluarga\n",PartnerName);
+        getch();
         return;
-    } else {
-        NkAdd NodeParents;
-        char NamaParents[50];
-        int usia, gender = 1, isHidup,prosespilih;
-
-        //memasukan parent dari pasangan
-        printf("Masukan nama parents dari pasangan (ayah) : ");
-        scanf(" %[^\n]", NamaParents);
-        getchar();
-        printf("Masukkan usia: ");
-        scanf("%d", &usia);
-        printf("Apakah mash hidup ? (1 = Hidup, 0 = Tidak)");
-        scanf("%d",&isHidup);
-        getchar();
-        NodeParents = CreateNode(NULL,NamaParents,usia,gender,isHidup);
-
-        //memasukan pasangan dari parent
-        char NamaPasanganParents[50];
-        int usiaPasangan, genderPasangan = 0, isHidupPasangan;
-
-        printf("Masukan nama pasangan dari parent (ibu) : ");
-        scanf(" %[^\n]", NamaPasanganParents);
-        getchar();
-        printf("Masukkan usia: ");
-        scanf("%d", &usiaPasangan);
-        printf("Apakah mash hidup ? (1 = Hidup, 0 = Tidak)");
-        scanf("%d",&isHidupPasangan);
-        getchar();
-        NkAdd PasanganParents = CreateNode(NULL, NamaPasanganParents,usiaPasangan, genderPasangan, isHidupPasangan);
-        NodeParents->Pasangan = PasanganParents;
-        PasanganParents->Pasangan = NodeParents;
-
-        NodePasangan->Pasangan->Parents = NodeParents;
-
-        NodeParents->FirstSon = NodePasangan->Pasangan;
-
-        //memasukan saudara kandung dari pasangan
-        int jumlahSaudara;
-        printf("Berapa jumlahh saudara dari pasangan? (max 2) : ");
-        scanf("%d",&jumlahSaudara);
-        getchar();
-        if (jumlahSaudara > 2) {
-            printf("Maksimal hanya 2!, Menambahkan 2 saudara");
-            jumlahSaudara = 2;
-        }
-
-        if (jumlahSaudara > 0) {
-            NkAdd SaudaraTerakhir = NodePasangan->Pasangan;
-        
-            for (int i = 0; i < jumlahSaudara; i++) {
-                char namaSaudara[50];
-                int usiaSau, genderSau, hidupSau;
-                printf("Masukan nama saudara ke-%d : ", i+1);
-                scanf(" %[^\n]", namaSaudara);
-                getchar();
-                printf("Masukkan usia: ");
-                scanf("%d", &usiaSau);
-                printf("Masukkan gender (1 = Pria, 0 = Wanita): ");
-                scanf("%d", &genderSau);
-                getchar();
-                printf("Apakah mash hidup ? (1 = Hidup, 0 = Tidak)");
-                scanf("%d",&hidupSau);
-                getchar();
-
-                NkAdd Saudara = CreateNode(NodePasangan->Pasangan->Parents,namaSaudara,usiaSau,genderSau,hidupSau);
-                SaudaraTerakhir->NextBrother = Saudara;
-                SaudaraTerakhir = Saudara;
-            }
-        } else {
-            printf("Tidak menambahkan saudara");
-        }
     }
+
+    if (NodePasangan->Pasangan == NULL) {
+        printf("Node yang kamu cari belum mempunyai pasangan\n");
+        getch();
+        return;
+    } 
+
+    NkAdd NodeParents;
+    char NamaParents[50];
+    int usia, gender = 1, isHidup,prosespilih;
+
+    // memasukan parent dari pasangan
+
+    printf("Masukan nama parents dari pasangan (ayah) : ");
+    scanf(" %[^\n]", NamaParents);
+    getchar();
+    printf("Masukkan usia: ");
+    scanf("%d", &usia);
+
+    if (usia < NodePasangan->Pasangan->Identitas.Usia + 18) {
+        printf("\nUsia harus 18 tahun lebih besar dari anak\n");
+        getch();
+        return;
+    }
+    printf("Apakah mash hidup ? (1 = Hidup, 0 = Tidak) : ");
+    scanf("%d",&isHidup);
+    getchar();
+
+    NodeParents = CreateNode(NULL,NamaParents,usia,gender,isHidup);
+
+    //memasukan pasangan dari parent
+    char NamaPasanganParents[50];
+    int usiaPasangan, genderPasangan = 0, isHidupPasangan;
+
+    printf("\nMasukan nama pasangan dari parent (ibu) : ");
+    scanf(" %[^\n]", NamaPasanganParents);
+    getchar();
+    printf("Masukkan usia: ");
+    scanf("%d", &usiaPasangan);
+
+    if (usia < NodePasangan->Pasangan->Identitas.Usia + 18) {
+        printf("\nUsia harus 18 tahun lebih besar dari anak\n");
+        getch();
+        return;
+    }
+    printf("Apakah mash hidup ? (1 = Hidup, 0 = Tidak) : ");
+    scanf("%d",&isHidupPasangan);
+    getchar();
+
+    NkAdd PasanganParents = CreateNode(NULL, NamaPasanganParents,usiaPasangan, genderPasangan, isHidupPasangan);
+    NodeParents->Pasangan = PasanganParents;
+    PasanganParents->Pasangan = NodeParents;
+    NodePasangan->Pasangan->Parents = NodeParents;
+    NodeParents->FirstSon = NodePasangan->Pasangan;
+
+    //memasukan saudara kandung dari pasangan
+    int jumlahSaudara;
+    printf("Berapa jumlah saudara dari pasangan? (max 2) : ");
+    scanf("%d",&jumlahSaudara);
+    getchar();
+
+    if (jumlahSaudara > 2) {
+        printf("Maksimal hanya 2 !\nMenambahkan 2 saudara\n");
+        jumlahSaudara = 2;
+    }
+
+    if (jumlahSaudara > 0) {
+        NkAdd SaudaraTerakhir = NodePasangan->Pasangan;
+
+        for (int i = 0; i < jumlahSaudara; i++) {
+            char namaSaudara[50];
+            int usiaSau, genderSau, hidupSau;
+            printf("Masukan nama saudara ke-%d : ", i+1);
+            scanf(" %[^\n]", namaSaudara);
+            getchar();
+            printf("Masukkan usia: ");
+            scanf("%d", &usiaSau);
+            printf("Masukkan gender (1 = Pria, 0 = Wanita) : ");
+            scanf("%d", &genderSau);
+            getchar();
+            printf("Apakah mash hidup ? (1 = Hidup, 0 = Tidak) : ");
+            scanf("%d",&hidupSau);
+            getchar();
+
+            NkAdd Saudara = CreateNode(NodePasangan->Pasangan->Parents,namaSaudara,usiaSau,genderSau,hidupSau);
+            SaudaraTerakhir->NextBrother = Saudara;
+            SaudaraTerakhir = Saudara;
+        }
+    } else {
+        printf("Tidak menambahkan saudara\n");
+    }
+
 }
 
 void CheckHubunganKeluarga(NTree tree) {
@@ -262,15 +308,23 @@ void CheckHubunganKeluarga(NTree tree) {
 
     if (NPerson1 == NULL || NPerson2 == NULL) {
         printf("Salah satu node tidak ditemukan.\n");
+        getch();
         return;
     }
 
     // Pasangan langsung
-    if ((NPerson1->Pasangan && strcmp(NPerson1->Pasangan->Identitas.info, nameP2) == 0) ||
-        (NPerson2->Pasangan && strcmp(NPerson2->Pasangan->Identitas.info, nameP1) == 0)) {
+    if ((NPerson1->Pasangan && strcmp(NPerson1->Pasangan->Identitas.Nama, nameP2) == 0) ||
+        (NPerson2->Pasangan && strcmp(NPerson2->Pasangan->Identitas.Nama, nameP1) == 0)) {
         printf("\n%s dan %s adalah pasangan langsung.\n", nameP1, nameP2);
         printf("Hubungan: Pasangan\n");
+        getch();
         return;
+    }
+
+    if ((NPerson1->Pasangan && NPerson1->Pasangan == NPerson2->Parents) || (NPerson1->Pasangan && NPerson1->Pasangan == NPerson2->Parents->Pasangan)) {
+        printf("\n%s adalah mertua dari %s\n", nameP2, nameP1);
+        getch();
+        return; 
     }
 
     // Isi stack untuk penelusuran ke leluhur
@@ -311,7 +365,7 @@ void CheckHubunganKeluarga(NTree tree) {
 
     // Cetak hasil
     if (LastCommon != NULL) {
-        printf("\nLeluhur terdekat bersama: %s\n", LastCommon->Identitas.info);
+        printf("\nLeluhur terdekat bersama: %s\n", LastCommon->Identitas.Nama);
     } else {
         printf("\nTidak ditemukan leluhur bersama.\n");
     }
@@ -321,6 +375,7 @@ void CheckHubunganKeluarga(NTree tree) {
 
     // Tentukan hubungan
     printf("Hubungan antara %s dan %s: ", nameP1, nameP2);
+    
     if (gen1 == 0 && gen2 == 1) {
         printf("Orang tua dan anak.\n");
     } else if (gen1 == 1 && gen2 == 0) {
@@ -331,16 +386,24 @@ void CheckHubunganKeluarga(NTree tree) {
         printf("Cucu dan kakek/nenek.\n");
     } else if (gen1 == 1 && gen2 == 1) {
         printf("Saudara kandung.\n");
+    } else if ((gen1 == 1 && gen2 == 2) || (gen1 == 2 && gen2 == 1)) {
+        printf("Paman/Bibi dan Keponakan.\n");
+    } else if (gen1 == 2 && gen2 == 2) {
+        printf("Sepupu.\n");
     } else if (gen1 == gen2) {
-        printf("Sepupu atau kerabat satu generasi.\n");
+        printf("Sepupu jauh atau kerabat satu generasi lebih jauh.\n");
     } else {
-        printf("Kerabat jauh.\n");
+        printf("Kerabat jauh atau beda generasi.\n");
     }
+    getch();
 }
 
-
 void PrintSilsilah(NTree tree) {
-
+    if (tree.root == NULL) {
+        printf("Pohon kosong.\n");
+    } else {
+        PrintTreeRek(tree.root, 0);
+    }
 }
 
 void WarisHarta(NTree tree,char* parentName) {
@@ -423,7 +486,7 @@ void WarisHarta(NTree tree,char* parentName) {
         if(JmlSaudara > 1){ //perhitungan bagian apabila saudara yang meninggal lebih dari 1
             nodeSaudara = TargetNode->Parents->FirstSon;
             while(nodeSaudara != NULL){
-                if(nodeSaudara->Identitas.info == TargetNode->Identitas.info && nodeSaudara->Identitas.IsHidup){
+                if(nodeSaudara->Identitas.Nama == TargetNode->Identitas.Nama && nodeSaudara->Identitas.IsHidup){
                     nodeSaudara = nodeSaudara->NextBrother;
                 }else if(nodeSaudara->Identitas.Gender = 0 && nodeSaudara->Identitas.IsHidup){
                     sdrPerempuan++;
@@ -437,7 +500,7 @@ void WarisHarta(NTree tree,char* parentName) {
                 nodeSaudara = TargetNode->Parents->FirstSon;
                 pembagian = (1.0/2.0)/sdrLaki;
                 while(nodeSaudara != NULL){
-                    if(nodeSaudara->Identitas.info == TargetNode->Identitas.info ){
+                    if(nodeSaudara->Identitas.Nama == TargetNode->Identitas.Nama ){
                         nodeSaudara = nodeSaudara->NextBrother;
                     }else if(nodeSaudara->Identitas.IsHidup){
                         EnQueue(&queue,nodeSaudara,pembagian);
@@ -448,7 +511,7 @@ void WarisHarta(NTree tree,char* parentName) {
                 nodeSaudara = TargetNode->Parents->FirstSon;
                 pembagian = (2.0/3.0)/sdrPerempuan;
                 while(nodeSaudara != NULL){
-                    if(nodeSaudara->Identitas.info == TargetNode->Identitas.info){
+                    if(nodeSaudara->Identitas.Nama == TargetNode->Identitas.Nama){
                         nodeSaudara = nodeSaudara->NextBrother;
                     }else if(nodeSaudara->Identitas.IsHidup){
                         EnQueue(&queue,nodeSaudara,pembagian);
@@ -458,7 +521,7 @@ void WarisHarta(NTree tree,char* parentName) {
             }else{
                 nodeSaudara = TargetNode->Parents->FirstSon;
                 while(nodeSaudara != NULL){
-                    if(nodeSaudara->Identitas.info == TargetNode->Identitas.info){
+                    if(nodeSaudara->Identitas.Nama == TargetNode->Identitas.Nama){
                         nodeSaudara = nodeSaudara->NextBrother;
                     }else if(nodeSaudara->Identitas.Gender = 1 && nodeSaudara->Identitas.IsHidup){
                         pembagian = (1.0/2.0)/sdrLaki;
@@ -494,7 +557,7 @@ void WarisHarta(NTree tree,char* parentName) {
         if(JmlSaudara > 1){ //perhitungan bagian apabila saudara yang meninggal lebih dari 1
             nodeSaudara = TargetNode->FirstSon;
             while(nodeSaudara->NextBrother != NULL){
-                if(nodeSaudara->Identitas.info == TargetNode->Identitas.info){
+                if(nodeSaudara->Identitas.Nama == TargetNode->Identitas.Nama){
                     nodeSaudara = nodeSaudara->NextBrother;
                 }else if(nodeSaudara->Identitas.Gender = 0 && nodeSaudara->Identitas.IsHidup){
                     sdrPerempuan++;
@@ -508,7 +571,7 @@ void WarisHarta(NTree tree,char* parentName) {
                 nodeSaudara = TargetNode->FirstSon;
                 pembagian = (1.0/2.0)/sdrLaki;
                 while(nodeSaudara->NextBrother != NULL){
-                    if(nodeSaudara->Identitas.info == TargetNode->Identitas.info){
+                    if(nodeSaudara->Identitas.Nama == TargetNode->Identitas.Nama){
                         nodeSaudara = nodeSaudara->NextBrother;
                     }else{
                         EnQueue(&queue,nodeSaudara,pembagian);
@@ -519,7 +582,7 @@ void WarisHarta(NTree tree,char* parentName) {
                 nodeSaudara = TargetNode->FirstSon;
                 pembagian = (2.0/3.0)/sdrPerempuan;
                 while(nodeSaudara->NextBrother != NULL){
-                    if(nodeSaudara->Identitas.info == TargetNode->Identitas.info){
+                    if(nodeSaudara->Identitas.Nama == TargetNode->Identitas.Nama){
                         nodeSaudara = nodeSaudara->NextBrother;
                     }else{
                         EnQueue(&queue,nodeSaudara,pembagian);
@@ -529,7 +592,7 @@ void WarisHarta(NTree tree,char* parentName) {
             }else{
                 nodeSaudara = TargetNode->FirstSon;
                 while(nodeSaudara->NextBrother != NULL){
-                    if(nodeSaudara->Identitas.info == TargetNode->Identitas.info){
+                    if(nodeSaudara->Identitas.Nama == TargetNode->Identitas.Nama){
                         nodeSaudara = nodeSaudara->NextBrother;
                     }else if(nodeSaudara->Identitas.Gender = 1){
                         pembagian = (1.0/2.0)/sdrLaki;
@@ -555,7 +618,7 @@ void WarisHarta(NTree tree,char* parentName) {
     i = 1;
     while(Q != NULL){
         printf("\n\n===============================\n");
-        printf("Pewaris Ke-%d adalah %s",i,Q->data->Identitas.info);
+        printf("Pewaris Ke-%d adalah %s",i,Q->data->Identitas.Nama);
         printf("\nMendapat bagian sebesar %.2f dari harta mayyit",Q->bagianHarta);
         printf("\n===============================\n");    
         Q = Q->next;
@@ -598,4 +661,23 @@ void printFromFile(const char* location) {
 /*fungsi pengecekan*/
 boolean HasPartner(NkAdd node) {
 
+}
+
+int ValidasiUsiaOrtu (NkAdd Ortu) {
+    int hasil;
+
+    if (Ortu == NULL || Ortu->Pasangan == NULL) {
+        return 0;
+    }
+
+    int UsiaOrtu = Ortu->Identitas.Usia;
+    int UsiaPasanganOrtu = Ortu->Pasangan->Identitas.Usia;
+    
+    if (UsiaOrtu > UsiaPasanganOrtu) {
+        hasil = UsiaPasanganOrtu - 18;
+        return hasil;
+    } else {
+        hasil = UsiaOrtu - 18;
+        return hasil;
+    }
 }

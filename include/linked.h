@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <conio.h>
 #define MALE 1
 #define FEMALE 0
 
@@ -14,7 +15,7 @@ typedef struct Node* NkAdd;
 
 /*INFO*/
 typedef struct Info_Orang{
-    char info[50];
+    char Nama[50];
     int Usia;
     boolean Gender;
     boolean IsHidup;

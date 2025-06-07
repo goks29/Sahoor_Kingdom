@@ -32,6 +32,7 @@ void printFromFile(const char* location);
 /*fungsi pengecekan*/
 boolean HasPartner(NkAdd node);
 
+int ValidasiUsiaOrtu (NkAdd Ortu);
 
 
 

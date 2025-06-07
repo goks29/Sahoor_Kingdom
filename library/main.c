@@ -1,23 +1,27 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "Keluarga.h" // pastikan file header ini sesuai dan lengkap
+#include "Keluarga.h" 
 
 int main() {
     NTree tree;
-    
-    // Inisialisasi tree kosong
-    InitNbTree(&tree); // Pastikan InitTree ada dan sesuai
 
+    InitNbTree(&tree); 
+    printFromFile("assets/SahoorFamily.txt");
+    InsertLeluhur(&tree);
     int pilihan;
     char nama[50],NodeMati[50];
 
     do {
+        system("cls");
+        printf("\n\n    Silsilah Keluarga : \n");
+        PrintSilsilah(tree);
         printf("\n==== Menu Silsilah Keluarga ====\n");
-        printf("1. Tambah Leluhur\n");
-        printf("2. Tambah Pasangan\n");
-        printf("3. Tambah Anak\n");
-        printf("4. Cek Koneksi Keluarga\n");
-        printf("5. Tambah Keluarga Pasangan\n");
+        printf("1. Tambah Pasangan\n");
+        printf("2. Tambah Anak\n");
+        printf("3. Cek Koneksi Keluarga\n");
+        printf("4. Waris Harta\n");
+        printf("5. Tambahkan keluarga pasangan\n");
+        printf("6. Print Tree\n");
         printf("0. Keluar\n");
         printf("Pilihan: ");
         scanf("%d", &pilihan);
@@ -25,32 +29,50 @@ int main() {
 
         switch(pilihan) {
             case 1:
-                InsertLeluhur(&tree);
-                break;
-            case 2:
-                printf("Masukkan nama yang ingin diberi pasangan: ");
+                system("cls");
+                printf("\n");
+                PrintSilsilah(tree);
+                printf("\n");
+                printf("Masukkan nama yang ingin diberi pasangan : ");
                 scanf(" %[^\n]", nama);
                 InsertPasangan(&tree, nama);
                 break;
-            case 3:
-                printf("Masukkan nama orang tua: ");
+            case 2:
+                system("cls");
+                printf("\n");
+                PrintSilsilah(tree);
+                printf("\n");
+                printf("Masukkan nama orang tua : ");
                 scanf(" %[^\n]", nama);
                 InsertMember(&tree, nama);
                 break;
-            case 4:
+            case 3:
+                system("cls");
+                printf("\n");
+                PrintSilsilah(tree);
+                printf("\n");
                 CheckHubunganKeluarga(tree);
                 break;
-            case 5:
-<<<<<<< Updated upstream
-                printf("Masukan nama pasangan yang ingin diisi data keluarga : ");
-                scanf(" %[^\n]", nama);
-                InsertKeluargaPasangan(&tree, nama);
-                break;    
-=======
+            case 4:
+                system("cls");
+                printf("\n");
+                PrintSilsilah(tree);
+                printf("\n");
                 printf("masukan nama node yang meninggal : ");
                 scanf(" %[^\n]",NodeMati);
                 WarisHarta(tree,NodeMati);
->>>>>>> Stashed changes
+            case 5:
+                system("cls");
+                printf("\n");
+                PrintSilsilah(tree);
+                printf("\n");
+                printf("Masukan nama pasangan yang ingin diisi data keluarga : ");
+                scanf(" %[^\n]", nama);
+                InsertKeluargaPasangan(&tree, nama);
+            case 6:
+                system("cls");
+                printf("\n\n");
+                PrintSilsilah(tree);
             case 0:
                 printf("Terima kasih!\n");
                 break;

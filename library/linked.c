@@ -4,7 +4,7 @@ NkAdd CreateNode(NkAdd parents, const char* name, int usia, boolean gender, bool
     NkAdd newnode = (NkAdd)malloc(sizeof(NodeK));
 
     if (newnode != NULL) {
-        strcpy(newnode->Identitas.info, name);
+        strcpy(newnode->Identitas.Nama, name);
         newnode->Identitas.Usia = usia;
         newnode->Identitas.Gender = (boolean)gender;
         if(newnode->Identitas.Usia > 110){

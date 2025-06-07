@@ -16,7 +16,7 @@ void InitNbTree (NTree* T);
 
 boolean IsEmptyTree (NTree* T);
 
-void AddChild (NTree* T, const char* parents, infotype name, int usia, boolean gender, boolean hidup);
+void AddChild (NTree* T, NkAdd current, const char* parents, infotype name, int usia, boolean gender, boolean hidup);
 
 NkAdd SearchNode (NkAdd curNode, const char* name);
 
@@ -25,8 +25,5 @@ int isVisited(NkAdd* visited, int count, NkAdd node);
 NkAdd SearchNodeUniversal(NkAdd curNode, const char* name, NkAdd* visited, int* count);
 
 void PrintTreeRek(NkAdd node, int level);
-
-void PrintTree (NTree T);
-
 
 #endif
