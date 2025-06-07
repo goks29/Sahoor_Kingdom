@@ -26,6 +26,9 @@ void TimeSkip(NkAdd node, int year);
 
 /*Prosedur file dan assets*/
 void getDataFromFile(NTree* Tree);
+void getFamilyFromFile(NTree* Tree);
+void traverseLevel(NkAdd node, int level, boolean* adaYangDicetak);
+void levelOrderTraversal(NkAdd root);
 
 void printFromFile(const char* location);
 
