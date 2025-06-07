@@ -14,12 +14,10 @@ int main() {
     system("Pause");
 	system("cls");
 	
-    getFamilyFromFile(&tree);
+    getDataFromFile(&tree);
     
     if(IsEmptyTree(&tree)){
 		InsertLeluhur(&tree);	
-	}else{
-		getDataFromFile(&tree);
 	}
 	
 
