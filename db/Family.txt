@@ -1,4 +1,7 @@
 NULL, goklas, 29, 1 -> sumin, 21, 0
 sumin, gok, 11, 1NULL, goklas, 29, 1 -> sumin, 29, 0NULL, goklas, 29, 1 -> sumin, 18, 0NULL, goklas, 29, 1 -> sumin, 19, 0
 goklas, google, 2, 0
-goklas, google, 1, 1
+goklas, google, 1, 1NULL, goklas, 29, 1 -> sumin, 29, 0
+goklas, google, 11, 1NULL, goklas, 29, 1 -> sumin, 24, 0
+goklas, google, 3, 1NULL, goklas, 29, 1 -> sumin, 25, 0NULL, goklas, 29, 1 -> sumin, 25, 0NULL, goklas, 29, 1 -> sumin, 26, 0NULL, goklas, 29, 1 -> sumin, 25, 0NULL, goklas, 29, 1 -> sumin, 19, 0NULL, goklas, 29, 1 -> sumin, 20, 0NULL, goklas, 29, 1 -> sumin, 24, 0NULL, goklas, 29, 1 -> sumin, 24, 0NULL, gok, 29, 1 -> sum, 22, 0NULL, gok, 29, 1 -> sumin, 28, 0NULL, goklas, 29, 1 -> sumin, 22, 0NULL, goklas, 29, 1 -> sumin, 29, 0NULL, goklas, 29, 1 -> sumin, 22, 0
+goklas, google, 2, 1

@@ -13,7 +13,7 @@ int main() {
 
     do {
         system("cls");
-        printf("\n\n    Silsilah Keluarga : \n");
+        printf("\n\n                      Silsilah Keluarga : \n");
         PrintSilsilah(tree);
         printf("\n==== Menu Silsilah Keluarga ====\n");
         printf("1. Tambah Pasangan\n");
