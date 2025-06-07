@@ -10,9 +10,6 @@ int main() {
     int pilihan;
     char nama[50],NodeMati[50];
     system("cls");
-    printFromFile("assets/Rumah.txt");
-    system("Pause");
-	system("cls");
 	
     getDataFromFile(&tree);
     
@@ -25,19 +22,13 @@ int main() {
         system("cls");
         printf("\n==========================================================\n");
         printf("               KEADAAN KELUARGA SAHOOR\n");
-        printf("==========================================================\n\n");
-
-        // Tampilkan seluruh anggota keluarga
+        printf("==========================================================\n");
         if (IsEmptyTree(&tree)) {
             printf("[!] Pohon keluarga kosong.\n");
         } else {
-            levelOrderTraversal(tree.root);
+            PrintLevel(tree.root);
         }
-        
         printf("\n");
-        printFromFile("assets/SahoorFamily.txt");
-        printf("\n\n    Silsilah Keluarga : \n");
-        PrintSilsilah(tree);
         printf("\n==== Menu Silsilah Keluarga ====\n");
         printf("1. Tambah Pasangan\n");
         printf("2. Tambah Anak\n");

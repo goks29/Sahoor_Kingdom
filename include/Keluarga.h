@@ -17,18 +17,21 @@ void InsertKeluargaPasangan (NTree* tree, char* PartnerName);
 
 void CheckHubunganKeluarga(NTree tree);
 
-void PrintSilsilah(NTree tree);
-
 void WarisHarta(NTree tree,char* parentName);
 
 void TimeSkip(NkAdd node, int year);
 
+void PrintSilsilah(NTree tree);
+
+void CetakSilsilahPerGenerasi(NkAdd node, int level, boolean* adaYangDicetak);
+
+void PrintLevel(NkAdd root);
+
 
 /*Prosedur file dan assets*/
 void getDataFromFile(NTree* Tree);
+
 void getFamilyFromFile(NTree* Tree);
-void traverseLevel(NkAdd node, int level, boolean* adaYangDicetak);
-void levelOrderTraversal(NkAdd root);
 
 void printFromFile(const char* location);
 

@@ -439,14 +439,6 @@ void CheckHubunganKeluarga(NTree tree) {
     getch();
 }
 
-void PrintSilsilah(NTree tree) {
-    if (tree.root == NULL) {
-        printf("Pohon kosong.\n");
-    } else {
-        PrintTreeRek(tree.root, 0);
-    }
-}
-
 void WarisHarta(NTree tree,char* parentName) {
     
     Queue queue;
@@ -671,6 +663,56 @@ void TimeSkip(NkAdd node, int year) {
 
 }
 
+void PrintSilsilah(NTree tree) {
+    if (tree.root == NULL) {
+        printf("Pohon kosong.\n");
+    } else {
+        PrintTreeRek(tree.root, 0);
+    }
+}
+
+void CetakSilsilahPerGenerasi(NkAdd node, int level, boolean* adaYangDicetak) {
+    if (node == NULL) return;
+
+    if (level == 1) {
+        *adaYangDicetak = true;
+        if (node->Pasangan == NULL) {
+            printf("[%s] -> (%d) (%s) x [Belum ada pasangan]\n",
+                   node->Identitas.Nama,
+                   node->Identitas.Usia,
+                   node->Identitas.Gender ? "L" : "P");
+        } else {
+            printf("[%s] -> (%d) (%s) x [%s] -> (%d) (%s)\n",
+                   node->Identitas.Nama,
+                   node->Identitas.Usia,
+                   node->Identitas.Gender ? "L" : "P",
+                   node->Pasangan->Identitas.Nama,
+                   node->Pasangan->Identitas.Usia,
+                   node->Pasangan->Identitas.Gender ? "L" : "P");
+        }
+    }
+
+    CetakSilsilahPerGenerasi(node->FirstSon, level - 1, adaYangDicetak);
+    CetakSilsilahPerGenerasi(node->NextBrother, level, adaYangDicetak);
+}
+
+void PrintLevel(NkAdd root) {
+    if (root == NULL) return;
+
+    int currentLevel = 1;
+    boolean adaYangDicetak = true;
+
+    printf("\n\n          Silsilah Keluarga Inti  \n");
+
+    while (adaYangDicetak) {
+        adaYangDicetak = false;
+        printf("\t\tGenerasi %d:\n", currentLevel);
+        CetakSilsilahPerGenerasi(root, currentLevel, &adaYangDicetak);
+        printf("\n");
+        currentLevel++;
+    }
+}
+
 
 /*Prosedur file dan assets*/
 void getDataFromFile(NTree* tree) {
@@ -744,46 +786,6 @@ void getFamilyFromFile(NTree* tree) {
     }
 
     fclose(file);
-}
-
-void traverseLevel(NkAdd node, int level, boolean* adaYangDicetak) {
-    if (node == NULL) return;
-
-    if (level == 1) {
-        *adaYangDicetak = true;
-        if (node->Pasangan == NULL) {
-            printf("[%s] -> (%d) (%s) x [Belum ada pasangan]\n",
-                   node->Identitas.Nama,
-                   node->Identitas.Usia,
-                   node->Identitas.Gender ? "L" : "P");
-        } else {
-            printf("[%s] -> (%d) (%s) x [%s] -> (%d) (%s)\n",
-                   node->Identitas.Nama,
-                   node->Identitas.Usia,
-                   node->Identitas.Gender ? "L" : "P",
-                   node->Pasangan->Identitas.Nama,
-                   node->Pasangan->Identitas.Usia,
-                   node->Pasangan->Identitas.Gender ? "L" : "P");
-        }
-    }
-
-    traverseLevel(node->FirstSon, level - 1, adaYangDicetak);
-    traverseLevel(node->NextBrother, level, adaYangDicetak);
-}
-
-void levelOrderTraversal(NkAdd root) {
-    if (root == NULL) return;
-
-    int currentLevel = 1;
-    boolean adaYangDicetak = true;
-
-    while (adaYangDicetak) {
-        adaYangDicetak = false;
-        printf("\t\tGenerasi %d:\n", currentLevel);
-        traverseLevel(root, currentLevel, &adaYangDicetak);
-        printf("\n");
-        currentLevel++;
-    }
 }
 
 void printFromFile(const char* location) {

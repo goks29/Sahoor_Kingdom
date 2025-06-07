@@ -1,3 +1,4 @@
 LELUHUR, gok, 29, 1
 PASANGAN, gok, sumin, 22, 0
 KELUARGA_PASANGAN, gok, lee, 40, 1, min, 41, 0
+ANAK, gok, google, 2, 1
