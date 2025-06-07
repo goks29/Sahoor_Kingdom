@@ -646,7 +646,123 @@ void TimeSkip(NkAdd node, int year) {
 
 /*Prosedur file dan assets*/
 void getDataFromFile(NTree* Tree) {
+    FILE* file = fopen("db/Family.txt", "r");
+    if (file == NULL) {
+        printf("[x] File tidak dapat dibuka!\n");
+        exit(1);
+    }
 
+    char namaLeluhur[50], namaPasangan[50];
+    int usiaLeluhur, usiaPasangan, genderLeluhurInt, genderPasanganInt;
+
+    // Format: NULL,NamaLeluhur,Usia,Gender -> NamaPasangan,Usia,Gender
+    // Perbaikan: tambahkan spasi untuk mengabaikan kemungkinan spasi setelah koma
+    int jumlahTerbaca = fscanf(file, "NULL, %[^,], %d, %d -> %[^,], %d, %d",
+           namaLeluhur, &usiaLeluhur, &genderLeluhurInt,
+           namaPasangan, &usiaPasangan, &genderPasanganInt);
+
+    if (jumlahTerbaca != 6) {  // Ada 6 data yang dibaca (tidak 7)
+        printf("[x] Format baris pertama tidak valid!\n");
+        fclose(file);
+        exit(1);
+    }
+
+    boolean genderLeluhur = (genderLeluhurInt == 1);
+    boolean genderPasangan = (genderPasanganInt == 1);
+
+    NkAdd leluhur = CreateNode(NULL, namaLeluhur, usiaLeluhur, genderLeluhur, true);
+    NkAdd pasangan = CreateNode(NULL, namaPasangan, usiaPasangan, genderPasangan, true);
+
+    leluhur->Pasangan = pasangan;
+    pasangan->Pasangan = leluhur;
+
+    Tree->root = leluhur;
+
+    fclose(file);
+}
+
+void getFamilyFromFile(NTree* Tree) {
+    FILE* file = fopen("db/Family.txt", "r");
+    if (file == NULL) {
+        printf("[x] File tidak dapat dibuka!\n");
+        exit(1);
+    }
+
+    char line[256];
+    char namaAnak[50], namaOrtu[50];
+    int usia, genderInt;
+
+    // Lewati baris pertama
+    fgets(line, sizeof(line), file);
+
+    // Format: NamaAnak, Usia, Gender, ParentName
+    while (fgets(line, sizeof(line), file)) {
+        // Tambahkan spasi di sscanf untuk abaikan spasi setelah koma
+        int terisi = sscanf(line, " %[^,] , %d , %d , %[^\n]", namaAnak, &usia, &genderInt, namaOrtu);
+        if (terisi != 4) {
+            printf("[!] Format baris tidak valid: %s", line);
+            continue;
+        }
+
+        boolean gender = (genderInt == 1);
+        NkAdd parent = SearchNode(Tree->root, namaOrtu);
+        if (parent != NULL) {
+            NkAdd anakBaru = CreateNode(parent, namaAnak, usia, gender, true);
+            if (parent->FirstSon == NULL) {
+                parent->FirstSon = anakBaru;
+            } else {
+                NkAdd sibling = parent->FirstSon;
+                while (sibling->NextBrother != NULL) {
+                    sibling = sibling->NextBrother;
+                }
+                sibling->NextBrother = anakBaru;
+            }
+        } else {
+            printf("[!] Parent '%s' tidak ditemukan dalam pohon.\n", namaOrtu);
+        }
+    }
+
+    fclose(file);
+}
+
+void traverseLevel(NkAdd node, int level, boolean* adaYangDicetak) {
+    if (node == NULL) return;
+
+    if (level == 1) {
+        *adaYangDicetak = true;
+        if (node->Pasangan == NULL) {
+            printf("[%s] -> (%d) (%s) x [Belum ada pasangan]\n",
+                   node->Identitas.Nama,
+                   node->Identitas.Usia,
+                   node->Identitas.Gender ? "L" : "P");
+        } else {
+            printf("[%s] -> (%d) (%s) x [%s] -> (%d) (%s)\n",
+                   node->Identitas.Nama,
+                   node->Identitas.Usia,
+                   node->Identitas.Gender ? "L" : "P",
+                   node->Pasangan->Identitas.Nama,
+                   node->Pasangan->Identitas.Usia,
+                   node->Pasangan->Identitas.Gender ? "L" : "P");
+        }
+    }
+
+    traverseLevel(node->FirstSon, level - 1, adaYangDicetak);
+    traverseLevel(node->NextBrother, level, adaYangDicetak);
+}
+
+void levelOrderTraversal(NkAdd root) {
+    if (root == NULL) return;
+
+    int currentLevel = 1;
+    boolean adaYangDicetak = true;
+
+    while (adaYangDicetak) {
+        adaYangDicetak = false;
+        printf("\t\tGenerasi %d:\n", currentLevel);
+        traverseLevel(root, currentLevel, &adaYangDicetak);
+        printf("\n");
+        currentLevel++;
+    }
 }
 
 void printFromFile(const char* location) {
