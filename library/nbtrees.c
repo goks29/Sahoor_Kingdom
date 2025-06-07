@@ -139,7 +139,7 @@ void PrintTreeRek(NkAdd node, int level) {
         char* pasanganStatus = node->Pasangan->Identitas.IsHidup ? "Hidup" : "Meninggal";
         printf("~ Pasangan: %s (%d th) [%s, %s]\n", node->Pasangan->Identitas.Nama, node->Pasangan->Identitas.Usia, pasanganGender, pasanganStatus);
 
-        // Tampilkan keluarga dari pasangan jika ada
+        // Tampilkan keluarga dari pasangan jika ada//
         if (node->Pasangan->Parents != NULL) {
             for (int i = 0; i < level; i++) printf("    ");
             printf("  Keluarga dari pasangan %s:\n", node->Pasangan->Identitas.Nama);
