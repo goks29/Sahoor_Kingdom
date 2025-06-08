@@ -587,15 +587,49 @@ void CheckHubunganKeluarga(NTree tree) {
     getch();
 }
 
-void WarisHarta(NTree tree,char* parentName) {
+void WarisHarta(NTree tree,char* parentName,int harta){
     
     Queue queue;
     Qaddress Q;
-    double pembagian;
+    int sisaharta;
     initQueue(&queue);
+    
+    HitungBagianWaris(&queue,tree,parentName);
+
+    sisaharta = harta;
+    Q = queue.front;
+    int i = 1;
+    while(Q != NULL){
+        printf("\n\n===============================\n");
+        printf("Pewaris Ke-%d adalah %s",i,Q->data->Identitas.Nama);
+        printf("\nMendapat bagian sebesar %.2f dari harta mayyit",Q->bagianHarta);
+        printHarta(Q,harta,&sisaharta);
+        printf("\n===============================\n");    
+        Q = Q->next;
+        i++;
+    }
+
+}
+
+void printHarta(Qaddress Q, int harta, int *sisa) {
+    int bagianUang = (int)(harta * Q->bagianHarta); // harta * proporsi → dibulatkan ke bawah
+
+    *sisa -= bagianUang;  // selalu kurangi sisa dulu
+
+    if (Q->next == NULL) {
+        // tambahkan sisa yang tersisa ke bagian terakhir
+        bagianUang += *sisa;
+    }
+
+    printf(" atau sejumlah Rp.%d", bagianUang);
+}
+    
+
+
+void HitungBagianWaris(Queue* queue,NTree tree,char* parentName){
+    double pembagian;
     int i,JmlSaudara,sdrLaki,sdrPerempuan;
     NkAdd nodeSaudara;
-
     JmlSaudara = 1;
     NkAdd TargetNode = SearchNode(tree.root,parentName);
     if(TargetNode == NULL){
@@ -607,34 +641,34 @@ void WarisHarta(NTree tree,char* parentName) {
         if(TargetNode->Pasangan->Identitas.Gender == 1){
             if(TargetNode->FirstSon == NULL){  //bagian suami ketika tidak ada anak
                 pembagian = 1.0/2.0;
-                EnQueue(&queue,TargetNode->Pasangan,pembagian);
+                EnQueue(queue,TargetNode->Pasangan,pembagian);
             }else{
                 pembagian = 1.0/4.0; //bagian suami ketika ada anak
-                EnQueue(&queue,TargetNode->Pasangan,pembagian);
+                EnQueue(queue,TargetNode->Pasangan,pembagian);
             }
         }else{
             if(TargetNode->FirstSon == NULL){ //bagian istri ketika tidak ada anak
                 pembagian = 1.0/4.0;
-                EnQueue(&queue,TargetNode->Pasangan,pembagian);
+                EnQueue(queue,TargetNode->Pasangan,pembagian);
             }else{  
                 pembagian = 1.0/8.0; //bagian istri ketika ada anak
-                EnQueue(&queue,TargetNode->Pasangan,pembagian);
+                EnQueue(queue,TargetNode->Pasangan,pembagian);
             }            
         }
     }
 
-    if(TargetNode->Parents->Pasangan != NULL && TargetNode->Parents->Pasangan->Identitas.IsHidup){
+    if(TargetNode->Parents != NULL && TargetNode->Parents->Pasangan != NULL && TargetNode->Parents->Pasangan->Identitas.IsHidup){
         if(TargetNode->Parents->Pasangan->Identitas.Gender == 0){
             if(TargetNode->FirstSon != NULL){ //bagian ibu(diakses sebagai pasangan parents) ketika ada anak
                 pembagian = 1.0/6.0;
-                EnQueue(&queue,TargetNode->Parents->Pasangan,pembagian);
+                EnQueue(queue,TargetNode->Parents->Pasangan,pembagian);
             }else{
                 pembagian = 1.0/3.0; //bagian ibu(diakses sebagai pasangan parents) ketika tidak ada anak;
-                EnQueue(&queue,TargetNode->Parents->Pasangan,pembagian);
+                EnQueue(queue,TargetNode->Parents->Pasangan,pembagian);
             }            
         }else{
             pembagian = 1.0/6.0; //bagian ayah(diakses sebagai pasangan parents) 
-            EnQueue(&queue,TargetNode->Parents->Pasangan,pembagian);
+            EnQueue(queue,TargetNode->Parents->Pasangan,pembagian);
         }
     }
 
@@ -642,18 +676,18 @@ void WarisHarta(NTree tree,char* parentName) {
         if(TargetNode->Parents->Identitas.Gender == 0){
             if(TargetNode->FirstSon != NULL){ //bagian ibu ketika ada anak
                 pembagian = 1.0/6.0;
-                EnQueue(&queue,TargetNode->Parents,pembagian);
+                EnQueue(queue,TargetNode->Parents,pembagian);
             }else{
                 pembagian = 1.0/3.0; //bagian ibu ketika tidak ada anak;
-                EnQueue(&queue,TargetNode->Parents,pembagian);
+                EnQueue(queue,TargetNode->Parents,pembagian);
             }            
         }else{
             pembagian = 1.0/6.0; //bagian ayah 
-            EnQueue(&queue,TargetNode->Parents,pembagian);
+            EnQueue(queue,TargetNode->Parents,pembagian);
         }        
     }
 
-    if(TargetNode->Parents->FirstSon != NULL && TargetNode->FirstSon == NULL){ //perhitungan pada saudara node
+    if(TargetNode->Parents != NULL && TargetNode->Parents->FirstSon != NULL && TargetNode->FirstSon == NULL){ //perhitungan pada saudara node
  
         JmlSaudara = 0;
         sdrLaki = 0;
@@ -667,7 +701,7 @@ void WarisHarta(NTree tree,char* parentName) {
         if(JmlSaudara > 1){ //perhitungan bagian apabila saudara yang meninggal lebih dari 1
             nodeSaudara = TargetNode->Parents->FirstSon;
             while(nodeSaudara != NULL){
-                if(nodeSaudara->Identitas.Nama == TargetNode->Identitas.Nama && nodeSaudara->Identitas.IsHidup){
+                if(nodeSaudara->Identitas.Nama != NULL && TargetNode->Identitas.Nama != NULL && strcmp(nodeSaudara->Identitas.Nama, TargetNode->Identitas.Nama) == 0){
                     nodeSaudara = nodeSaudara->NextBrother;
                 }else if(nodeSaudara->Identitas.Gender = 0 && nodeSaudara->Identitas.IsHidup){
                     sdrPerempuan++;
@@ -684,7 +718,7 @@ void WarisHarta(NTree tree,char* parentName) {
                     if(nodeSaudara->Identitas.Nama == TargetNode->Identitas.Nama ){
                         nodeSaudara = nodeSaudara->NextBrother;
                     }else if(nodeSaudara->Identitas.IsHidup){
-                        EnQueue(&queue,nodeSaudara,pembagian);
+                        EnQueue(queue,nodeSaudara,pembagian);
                         nodeSaudara = nodeSaudara->NextBrother;
                     }
                 }
@@ -695,7 +729,7 @@ void WarisHarta(NTree tree,char* parentName) {
                     if(nodeSaudara->Identitas.Nama == TargetNode->Identitas.Nama){
                         nodeSaudara = nodeSaudara->NextBrother;
                     }else if(nodeSaudara->Identitas.IsHidup){
-                        EnQueue(&queue,nodeSaudara,pembagian);
+                        EnQueue(queue,nodeSaudara,pembagian);
                         nodeSaudara = nodeSaudara->NextBrother;
                     }
                 }                
@@ -706,20 +740,20 @@ void WarisHarta(NTree tree,char* parentName) {
                         nodeSaudara = nodeSaudara->NextBrother;
                     }else if(nodeSaudara->Identitas.Gender = 1 && nodeSaudara->Identitas.IsHidup){
                         pembagian = (1.0/2.0)/sdrLaki;
-                        EnQueue(&queue,nodeSaudara,pembagian);
+                        EnQueue(queue,nodeSaudara,pembagian);
                     }else if(nodeSaudara->Identitas.IsHidup){
                         pembagian = (1.0/4.0)/sdrPerempuan;
-                        EnQueue(&queue,nodeSaudara,pembagian);
+                        EnQueue(queue,nodeSaudara,pembagian);
                     }
                 }
             }
         }else{
             if(nodeSaudara->Identitas.Gender == 0 && nodeSaudara->Identitas.IsHidup){
                 pembagian = 1.0/2.0;
-                EnQueue(&queue,nodeSaudara,pembagian);
+                EnQueue(queue,nodeSaudara,pembagian);
             }else if(nodeSaudara->Identitas.IsHidup){
                 pembagian = 1.0/2.0;
-                EnQueue(&queue,nodeSaudara,pembagian);
+                EnQueue(queue,nodeSaudara,pembagian);
             }
         }
     }
@@ -755,7 +789,7 @@ void WarisHarta(NTree tree,char* parentName) {
                     if(nodeSaudara->Identitas.Nama == TargetNode->Identitas.Nama){
                         nodeSaudara = nodeSaudara->NextBrother;
                     }else{
-                        EnQueue(&queue,nodeSaudara,pembagian);
+                        EnQueue(queue,nodeSaudara,pembagian);
                         nodeSaudara = nodeSaudara->NextBrother;
                     }
                 }
@@ -766,7 +800,7 @@ void WarisHarta(NTree tree,char* parentName) {
                     if(nodeSaudara->Identitas.Nama == TargetNode->Identitas.Nama){
                         nodeSaudara = nodeSaudara->NextBrother;
                     }else{
-                        EnQueue(&queue,nodeSaudara,pembagian);
+                        EnQueue(queue,nodeSaudara,pembagian);
                         nodeSaudara = nodeSaudara->NextBrother;
                     }
                 }                
@@ -777,34 +811,23 @@ void WarisHarta(NTree tree,char* parentName) {
                         nodeSaudara = nodeSaudara->NextBrother;
                     }else if(nodeSaudara->Identitas.Gender = 1){
                         pembagian = (1.0/2.0)/sdrLaki;
-                        EnQueue(&queue,nodeSaudara,pembagian);
+                        EnQueue(queue,nodeSaudara,pembagian);
                     }else{
                         pembagian = (1.0/4.0)/sdrPerempuan;
-                        EnQueue(&queue,nodeSaudara,pembagian);
+                        EnQueue(queue,nodeSaudara,pembagian);
                     }
                 }
             }
         }else{
             if(nodeSaudara->Identitas.Gender == 0){
                 pembagian = 1.0/2.0;
-                EnQueue(&queue,nodeSaudara,pembagian);
+                EnQueue(queue,nodeSaudara,pembagian);
             }else{
                 pembagian = 1.0/2.0;
-                EnQueue(&queue,nodeSaudara,pembagian);
+                EnQueue(queue,nodeSaudara,pembagian);
             }
         }        
-    }
-
-    Q = queue.front;
-    i = 1;
-    while(Q != NULL){
-        printf("\n\n===============================\n");
-        printf("Pewaris Ke-%d adalah %s",i,Q->data->Identitas.Nama);
-        printf("\nMendapat bagian sebesar %.2f dari harta mayyit",Q->bagianHarta);
-        printf("\n===============================\n");    
-        Q = Q->next;
-        i++;
-    }
+        }
 }
 
 void TimeSkip(NkAdd node, int year) {

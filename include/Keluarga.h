@@ -33,7 +33,11 @@ void CetakHubungan(int gen1, int gen2, char* namaP1, char* namaP2, NkAdd lastCom
 
 void CheckHubunganKeluarga(NTree tree);
 
-void WarisHarta(NTree tree,char* parentName);
+void WarisHarta(NTree tree,char* parentName,int harta);
+
+void HitungBagianWaris(Queue* Queue,NTree tree,char* parentName);
+
+void printHarta(Qaddress Q,int harta,int *sisa);
 
 void TimeSkip(NkAdd node, int year);
 

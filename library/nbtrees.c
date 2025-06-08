@@ -67,7 +67,7 @@ NkAdd SearchNode (NkAdd curNode, const char* name) {
     }
     
     if (curNode->Pasangan != NULL && strcmp(curNode->Pasangan->Identitas.Nama,name) == 0) {
-        return curNode;
+        return curNode->Pasangan;
     }
 
     NkAdd found = SearchNode(curNode->FirstSon,name);

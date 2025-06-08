@@ -7,7 +7,7 @@ int main() {
 
     InitNbTree(&tree);
 
-    int pilihan;
+    int pilihan,harta;
     char nama[50], NodeMati[50];
     system("cls");
 
@@ -95,8 +95,11 @@ int main() {
                 PrintLevel(tree.root);
                 printf("\nMasukkan nama node yang meninggal: ");
                 scanf(" %[^\n]", NodeMati);
-                WarisHarta(tree, NodeMati);
+                printf("\nMasukan total harta yang dimiliki node : Rp.");
+                scanf("%d",&harta);
+                WarisHarta(tree, NodeMati,harta);
                 printf("\n\nTekan enter untuk melanjutkan...\n");
+                getchar();
                 getchar();
                 break;
 
