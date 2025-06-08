@@ -1,9 +1,2 @@
 LELUHUR, gok, 59, 1, 1
 PASANGAN, gok, sumin, 45, 0, 1
-ANAK, gok, google, 24, 1, 1
-KELUARGA_PASANGAN, sumin, ayam, 63, 1, ayum, 65, 0
-SAUDARA_PASANGAN, sumin, ayom, 44, 1, 1
-ANAK, sumin, google, 24, 1, 1
-PASANGAN, ayam, ayum, 65, 0, 1
-ANAK, ayam, sumin, 45, 0, 1
-ANAK, ayam, ayom, 44, 1, 1

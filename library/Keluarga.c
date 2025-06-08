@@ -192,16 +192,26 @@ void InsertKeluargaPasangan(NTree* tree, char* PartnerName) {
 
     // Tentukan pasangan yang akan ditambahkan keluarganya
     NkAdd targetPasangan = NULL;
-    if (strcmp(Node->Identitas.Nama, PartnerName) == 0) {
-        targetPasangan = Node->Pasangan; // Jika Node adalah PartnerName, ambil pasangannya
-    } else if (Node->Pasangan && strcmp(Node->Pasangan->Identitas.Nama, PartnerName) == 0) {
-        targetPasangan = Node; // Jika Node adalah pasangan dari PartnerName, ambil Node
+    NkAdd temp = Node;  
+    boolean isKeturunanKeluargaInti = false;
+
+    while (temp != NULL) {
+        if (temp->Parents == tree->root || temp == tree->root) {
+            isKeturunanKeluargaInti = true;
+            break;
+        }
+        temp = temp->Parents;
     }
 
-    if (targetPasangan == NULL) {
-        printf("Node '%s' belum memiliki pasangan.\n", PartnerName);
-        getch();
-        return;
+    if (isKeturunanKeluargaInti) {
+        if (Node->Pasangan == NULL) {
+            printf("Node '%s' belum memiliki pasangan.\n", PartnerName);
+            getch();
+            return;
+        }
+        targetPasangan = Node->Pasangan;
+    } else {
+        targetPasangan = Node;
     }
 
     // Periksa apakah targetPasangan sudah memiliki orang tua
