@@ -173,157 +173,172 @@ void InsertMember(NTree* tree, char* parentName) {
     fclose(file);
 }
 
-void InsertKeluargaPasangan (NTree* tree, char* PartnerName) {
-    if(tree == NULL || tree->root == NULL){
-        printf("Tree Belum Ada atau Root Kosong");
+void InsertKeluargaPasangan(NTree* tree, char* PartnerName) {
+    if (tree == NULL || tree->root == NULL) {
+        printf("Tree belum ada atau root kosong.\n");
+        getch();
         return;
     }
 
-    NkAdd Node = SearchNode(tree->root, PartnerName);
-
-    Node = Node->Pasangan;
-
+    // Cari node dengan nama PartnerName
+    NkAdd visited[1000] = {0};
+    int visitedCount = 0;
+    NkAdd Node = SearchNodeUniversal(tree->root, PartnerName, visited, &visitedCount);
     if (Node == NULL) {
-        printf("Node yang '%s' tidak ada dalam silsilah keluarga\n",PartnerName);
+        printf("Node '%s' tidak ada dalam silsilah keluarga.\n", PartnerName);
         getch();
         return;
     }
 
-    if (Node->Pasangan == NULL) {
-        printf("Node yang kamu cari belum mempunyai pasangan\n");
-        getch();
-        return;
-    } 
+    // Tentukan pasangan yang akan ditambahkan keluarganya
+    NkAdd targetPasangan = NULL;
+    if (strcmp(Node->Identitas.Nama, PartnerName) == 0) {
+        targetPasangan = Node->Pasangan; // Jika Node adalah PartnerName, ambil pasangannya
+    } else if (Node->Pasangan && strcmp(Node->Pasangan->Identitas.Nama, PartnerName) == 0) {
+        targetPasangan = Node; // Jika Node adalah pasangan dari PartnerName, ambil Node
+    }
 
-    if (Node->Pasangan->Parents != NULL) {
-        printf("Keluarga dari '%s' sudah tercatat!\n", Node);
+    if (targetPasangan == NULL) {
+        printf("Node '%s' belum memiliki pasangan.\n", PartnerName);
         getch();
         return;
     }
 
-    NkAdd NodeAyah;
-    char NamaAyah[50];
-    int usia, isHidup,prosespilih;
-
-     // --------- Input Ayah (Parent dari pasangan) --------- //
-    printf("\n-------Input Orang Tua---------\n");
-
-    printf("\nMasukan nama Ayah dari '%s': ", Node->Identitas.Nama);
-    scanf(" %[^\n]", NamaAyah);
-    getchar();
-    printf("Masukkan usia (range tahun : %d tahun keatas): ",Node->Identitas.Usia + 18);
-    scanf("%d", &usia);
-
-    if (usia < Node->Identitas.Usia + 18) {
-        printf("\nUsia harus 18 tahun lebih besar dari anak\n");
+    // Periksa apakah targetPasangan sudah memiliki orang tua
+    if (targetPasangan->Parents != NULL) {
+        printf("Keluarga dari pasangan '%s' sudah tercatat!\n", targetPasangan->Identitas.Nama);
         getch();
         return;
     }
-    printf("Apakah mash hidup ? (1 = Hidup, 0 = Tidak) : ");
-    scanf("%d",&isHidup);
-    getchar();
 
-    NodeAyah = CreateNode(NULL,NamaAyah,usia,1,isHidup);
-
-    // --------- Input Ibu (Pasangan dari ayah) --------- //
-    char NamaIbu[50];
-    int usiaIbu, isHidupPasangan;
-
-    printf("\nMasukan nama Ibu dari '%s': ", Node->Identitas.Nama);
-    scanf(" %[^\n]", NamaIbu);
-    getchar();
-    printf("Masukkan usia (range tahun : %d tahun keatas): ",Node->Identitas.Usia + 18);
-    scanf("%d", &usiaIbu);
-
-    if (usiaIbu < Node->Identitas.Usia + 18) {
-        printf("\nUsia harus 18 tahun lebih besar dari anak\n");
-        getch();
-        return;
-    }
-    printf("Apakah mash hidup ? (1 = Hidup, 0 = Tidak) : ");
-    scanf("%d",&isHidupPasangan);
-    getchar();
-
-    NkAdd NodeIbu = CreateNode(NULL, NamaIbu,usiaIbu, 0, isHidupPasangan);
-    NodeAyah->Pasangan = NodeIbu;
-    NodeIbu->Pasangan = NodeAyah;
-    Node->Pasangan->Parents = NodeAyah;
-    NodeAyah->FirstSon = Node->Pasangan;
-
+    // Buka file sekali di awal
     FILE* file = fopen("db/Family.txt", "a");
     if (!file) {
-        printf("File tidak dapat dibuka");
+        printf("File tidak dapat dibuka.\n");
+        getch();
         return;
     }
-    fprintf(file, "KELUARGA_PASANGAN, %s, %s, %d, %d, %s, %d, %d\n",
-            Node->Pasangan->Identitas.Nama,
-            NodeAyah->Identitas.Nama,
-            NodeAyah->Identitas.Usia,
-            NodeAyah->Identitas.Gender,
-            NodeIbu->Identitas.Nama,
-            NodeIbu->Identitas.Usia,
-            NodeIbu->Identitas.Gender);
-    fclose(file);
 
-    // --------- Input Saudara (NextBrother dari node) --------- //
-    int jumlahSaudara;
+    // Input orang tua
+    char NamaAyah[50], NamaIbu[50];
+    int usiaAyah, usiaIbu, isHidupAyah, isHidupIbu;
+
+    printf("\n-------Input Orang Tua---------\n");
+    printf("Masukkan nama ayah dari '%s': ", targetPasangan->Identitas.Nama);
+    scanf(" %[^\n]", NamaAyah);
+    getchar();
+    printf("Masukkan usia (min %d tahun): ", targetPasangan->Identitas.Usia + 18);
+    scanf("%d", &usiaAyah);
+    if (usiaAyah < targetPasangan->Identitas.Usia + 18) {
+        printf("Usia ayah harus minimal 18 tahun lebih tua dari anak.\n");
+        fclose(file);
+        getch();
+        return;
+    }
+    printf("Apakah masih hidup? (1 = Hidup, 0 = Tidak): ");
+    scanf("%d", &isHidupAyah);
+    getchar();
+
+    printf("\nMasukkan nama ibu dari '%s': ", targetPasangan->Identitas.Nama);
+    scanf(" %[^\n]", NamaIbu);
+    getchar();
+    printf("Masukkan usia (min %d tahun): ", targetPasangan->Identitas.Usia + 18);
+    scanf("%d", &usiaIbu);
+    if (usiaIbu < targetPasangan->Identitas.Usia + 18) {
+        printf("Usia ibu harus minimal 18 tahun lebih tua dari anak.\n");
+        fclose(file);
+        getch();
+        return;
+    }
+    printf("Apakah masih hidup? (1 = Hidup, 0 = Tidak): ");
+    scanf("%d", &isHidupIbu);
+    getchar();
+
+    // Validasi nama unik
+    visitedCount = 0;
+    memset(visited, 0, sizeof(visited));
+    if (SearchNodeUniversal(tree->root, NamaAyah, visited, &visitedCount) ||
+        SearchNodeUniversal(tree->root, NamaIbu, visited, &visitedCount)) {
+        printf("Nama ayah atau ibu sudah ada dalam silsilah.\n");
+        fclose(file);
+        getch();
+        return;
+    }
+
+    // Buat node orang tua
+    NkAdd NodeAyah = CreateNode(NULL, NamaAyah, usiaAyah, 1, isHidupAyah);
+    NkAdd NodeIbu = CreateNode(NULL, NamaIbu, usiaIbu, 0, isHidupIbu);
+    NodeAyah->Pasangan = NodeIbu;
+    NodeIbu->Pasangan = NodeAyah;
+    targetPasangan->Parents = NodeAyah;
+    NodeAyah->FirstSon = targetPasangan;
+
+    // Simpan data orang tua ke file
+    fprintf(file, "KELUARGA_PASANGAN, %s, %s, %d, %d, %s, %d, %d\n",
+            targetPasangan->Identitas.Nama, NodeAyah->Identitas.Nama, NodeAyah->Identitas.Usia,
+            NodeAyah->Identitas.Gender, NodeIbu->Identitas.Nama, NodeIbu->Identitas.Usia,
+            NodeIbu->Identitas.Gender);
+
+    // Input saudara
     printf("\n-------Input Saudara---------\n");
-    printf("\nBerapa jumlah saudara dari pasangan? (max 2) : ");
-    scanf("%d",&jumlahSaudara);
+    int jumlahSaudara;
+    printf("Berapa jumlah saudara dari pasangan? (max 2): ");
+    scanf("%d", &jumlahSaudara);
     getchar();
 
     if (jumlahSaudara > 2) {
-        printf("\nMaksimal hanya 2 !\nMenambahkan 2 saudara\n");
+        printf("Maksimal hanya 2 saudara.\n");
         jumlahSaudara = 2;
     }
 
     if (jumlahSaudara > 0) {
-        NkAdd SaudaraTerakhir = Node->Pasangan;
-        int min = 0;
+        NkAdd SaudaraTerakhir = targetPasangan;
         for (int i = 0; i < jumlahSaudara; i++) {
-            min++;
             char namaSaudara[50];
             int usiaSau, genderSau, hidupSau;
-            printf("\nMasukan nama saudara ke-%d : ", i+1);
+            printf("\nMasukkan nama saudara ke-%d: ", i + 1);
             scanf(" %[^\n]", namaSaudara);
             getchar();
 
-            printf("Masukkan usia (range usia %d - 1 tahun) : ",SaudaraTerakhir->Identitas.Usia - min);
+            printf("Masukkan usia (max %d tahun): ", usiaAyah - 18);
             scanf("%d", &usiaSau);
-            if (usiaSau > SaudaraTerakhir->Identitas.Usia - min) {
-                printf("\nUsia saudara harus dibawah umur kakak nya.\n");
+            if (usiaSau > usiaAyah - 18 || usiaSau > usiaIbu - 18) {
+                printf("Usia saudara harus minimal 18 tahun lebih muda dari orang tua.\n");
+                fclose(file);
                 getch();
                 return;
             }
-            printf("Masukkan gender (1 = Pria, 0 = Wanita) : ");
+            printf("Masukkan gender (1 = Pria, 0 = Wanita): ");
             scanf("%d", &genderSau);
             getchar();
-
-            printf("Apakah mash hidup ? (1 = Hidup, 0 = Tidak) : ");
-            scanf("%d",&hidupSau);
+            printf("Apakah masih hidup? (1 = Hidup, 0 = Tidak): ");
+            scanf("%d", &hidupSau);
             getchar();
 
-            NkAdd Saudara = CreateNode(Node->Pasangan->Parents,namaSaudara,usiaSau,genderSau,hidupSau);
-            SaudaraTerakhir->NextBrother = Saudara;
-            SaudaraTerakhir = Saudara;
-            
-            FILE* file = fopen("db/Family.txt", "a");
-            if (!file) {
-                printf("File tidak dapat dibuka");
+            // Validasi nama saudara unik
+            visitedCount = 0;
+            memset(visited, 0, sizeof(visited));
+            if (SearchNodeUniversal(tree->root, namaSaudara, visited, &visitedCount)) {
+                printf("Nama saudara '%s' sudah ada dalam silsilah.\n", namaSaudara);
+                fclose(file);
+                getch();
                 return;
             }
+
+            NkAdd Saudara = CreateNode(NodeAyah, namaSaudara, usiaSau, genderSau, hidupSau);
+            SaudaraTerakhir->NextBrother = Saudara;
+            SaudaraTerakhir = Saudara;
+
+            // Simpan saudara ke file
             fprintf(file, "SAUDARA_PASANGAN, %s, %s, %d, %d\n",
-                    Node->Pasangan->Identitas.Nama,
-                    Saudara->Identitas.Nama,
-                    Saudara->Identitas.Usia,
-                    Saudara->Identitas.Gender);
-            fclose(file);
+                    targetPasangan->Identitas.Nama, Saudara->Identitas.Nama,
+                    Saudara->Identitas.Usia, Saudara->Identitas.Gender);
         }
-    } else {
-        printf("Tidak menambahkan saudara\n");
-        getch();
-        return;
     }
+
+    fclose(file);
+    printf("Keluarga pasangan '%s' berhasil ditambahkan.\n", targetPasangan->Identitas.Nama);
+    getch();
 }
 
 void CheckHubunganKeluarga(NTree tree) {
@@ -675,7 +690,7 @@ void PrintSilsilah(NTree tree) {
 void CetakSilsilahPerGenerasi(NkAdd node, int level, boolean* adaYangDicetak, NkAdd root) {
     if (node == NULL) return;
 
-    // Hanya cetak node yang masih dalam silsilah root
+    // Filter node yang berasal dari silsilah root
     if (!IsDescendantOf(node, root) && node != root) return;
 
     if (level == 1) {
@@ -698,11 +713,10 @@ void CetakSilsilahPerGenerasi(NkAdd node, int level, boolean* adaYangDicetak, Nk
 
     CetakSilsilahPerGenerasi(node->FirstSon, level - 1, adaYangDicetak, root);
 
-    // Hanya cetak NextBrother kalau memang anak dari orang tua yang valid (masih dalam silsilah root)
-    if (node->Parents != NULL && IsDescendantOf(node->Parents, root)) {
-        CetakSilsilahPerGenerasi(node->NextBrother, level, adaYangDicetak, root);
-    }
+    // Selalu lanjut ke next brother (anak-anak dalam generasi yang sama)
+    CetakSilsilahPerGenerasi(node->NextBrother, level, adaYangDicetak, root);
 }
+
 
 void PrintLevel(NkAdd root) {
     if (root == NULL) return;
@@ -747,84 +761,94 @@ void getFamilyFromFile(NTree* tree) {
 
     char line[256];
     while (fgets(line, sizeof(line), file)) {
-        char nama1[50], nama2[50];
-        int usia1, gender1, usia2, gender2;
+        char nama1[50], nama2[50], ayahName[50], ibuName[50];
+        int usia1, gender1, usia2, gender2, isHidup1, isHidup2;
+        int ayahAge, ayahGender, ibuAge, ibuGender;
 
         // LELUHUR
-        if (sscanf(line, "LELUHUR, %[^,], %d, %d", nama1, &usia1, &gender1) == 3) {
-            NkAdd root = CreateNode(NULL, nama1, usia1, gender1, 1);
-            tree->root = root;
+        if (sscanf(line, "LELUHUR, %49[^,], %d, %d, %d", nama1, &usia1, &gender1, &isHidup1) >= 3) {
+            if (tree->root) {
+                printf("Peringatan: Leluhur sudah ada, mengabaikan %s.\n", nama1);
+                continue;
+            }
+            tree->root = CreateNode(NULL, nama1, usia1, gender1, isHidup1);
+            continue;
         }
+
         // PASANGAN
-        else if (sscanf(line, "PASANGAN, %[^,], %[^,], %d, %d", nama1, nama2, &usia2, &gender2) == 4) {
+        if (sscanf(line, "PASANGAN, %49[^,], %49[^,], %d, %d, %d", nama1, nama2, &usia2, &gender2, &isHidup2) >= 4) {
+            NkAdd visited[1000] = {0};
             int visitedCount = 0;
-            NkAdd visited[1000];
             NkAdd node = SearchNodeUniversal(tree->root, nama1, visited, &visitedCount);
-            if (node) {
-                NkAdd pasangan = CreateNode(NULL, nama2, usia2, gender2, 1);
-                node->Pasangan = pasangan;
-                pasangan->Pasangan = node;
+            if (!node) {
+                printf("Peringatan: Node '%s' tidak ditemukan untuk PASANGAN.\n", nama1);
+                continue;
             }
+            NkAdd pasangan = CreateNode(NULL, nama2, usia2, gender2, isHidup2);
+            node->Pasangan = pasangan;
+            pasangan->Pasangan = node;
+            continue;
         }
+
         // ANAK
-        else if (sscanf(line, "ANAK, %[^,], %[^,], %d, %d", nama1, nama2, &usia2, &gender2) == 4) {
+        if (sscanf(line, "ANAK, %49[^,], %49[^,], %d, %d, %d", nama1, nama2, &usia2, &gender2, &isHidup2) >= 4) {
+            NkAdd visited[1000] = {0};
             int visitedCount = 0;
-            NkAdd visited[1000];
             NkAdd parent = SearchNodeUniversal(tree->root, nama1, visited, &visitedCount);
-            if (parent) {
-                AddChild(tree, parent, nama1, nama2, usia2, gender2, 1);
+            if (!parent) {
+                printf("Peringatan: Parent '%s' tidak ditemukan untuk ANAK.\n", nama1);
+                continue;
             }
+            AddChild(tree, parent, nama1, nama2, usia2, gender2, isHidup2);
+            continue;
         }
-    }
-
-    // Reset file pointer ke awal
-    rewind(file); 
-
-    while (fgets(line, sizeof(line), file)) {
-        char nama1[50], nama2[50], nama_ayah[50], nama_ibu[50];
-        int usia1, gender1, usia2, gender2;
 
         // KELUARGA_PASANGAN
-        if (sscanf(line, "KELUARGA_PASANGAN, %[^,], %[^,], %d, %d, %[^,], %d, %d",
-                   nama1, nama_ayah, &usia1, &gender1, nama_ibu, &usia2, &gender2) == 7) {
+        if (sscanf(line, "KELUARGA_PASANGAN, %49[^,], %49[^,], %d, %d, %49[^,], %d, %d",
+                   nama1, ayahName, &ayahAge, &ayahGender, ibuName, &ibuAge, &ibuGender) == 7) {
+            NkAdd visited[1000] = {0};
             int visitedCount = 0;
-            NkAdd visited[1000];
             NkAdd pasangan = SearchNodeUniversal(tree->root, nama1, visited, &visitedCount);
-            if (pasangan && pasangan->Pasangan) {
-                NkAdd ayah = CreateNode(NULL, nama_ayah, usia1, gender1, 1);
-                NkAdd ibu = CreateNode(NULL, nama_ibu, usia2, gender2, 1);
-                ayah->Pasangan = ibu;
-                ibu->Pasangan = ayah;
+            if (!pasangan) {
+                printf("Peringatan: Pasangan '%s' tidak ditemukan untuk KELUARGA_PASANGAN.\n", nama1);
+                continue;
+            }
+            NkAdd ayah = CreateNode(NULL, ayahName, ayahAge, ayahGender, 1);
+            NkAdd ibu = CreateNode(NULL, ibuName, ibuAge, ibuGender, 1);
+            ayah->Pasangan = ibu;
+            ibu->Pasangan = ayah;
+            pasangan->Parents = ayah;
+            ayah->FirstSon = pasangan;
+            continue;
+        }
 
-                pasangan->Pasangan->Parents = ayah;
-                ayah->FirstSon = pasangan->Pasangan;
-            }
-        }
         // SAUDARA_PASANGAN
-        else if (sscanf(line, "SAUDARA_PASANGAN, %[^,], %[^,], %d, %d", nama1, nama2, &usia2, &gender2) == 4) {
+        if (sscanf(line, "SAUDARA_PASANGAN, %49[^,], %49[^,], %d, %d, %d", nama1, nama2, &usia2, &gender2, &isHidup2) >= 4) {
+            NkAdd visited[1000] = {0};
             int visitedCount = 0;
-            NkAdd visited[1000];
             NkAdd pasangan = SearchNodeUniversal(tree->root, nama1, visited, &visitedCount);
-            if (pasangan && pasangan->Pasangan) {
-                NkAdd parents = pasangan->Pasangan->Parents;
-                if (parents) {
-                    NkAdd saudara = CreateNode(parents, nama2, usia2, gender2, 1);
-                    NkAdd current = parents->FirstSon;
-                    if (current == NULL) {
-                        parents->FirstSon = saudara;
-                    } else {
-                        while (current->NextBrother != NULL)
-                            current = current->NextBrother;
-                        current->NextBrother = saudara;
-                    }
-                }
+            if (!pasangan || !pasangan->Parents) {
+                printf("Peringatan: Pasangan '%s' atau orang tua tidak ditemukan untuk SAUDARA_PASANGAN.\n", nama1);
+                continue;
             }
+            NkAdd parents = pasangan->Parents;
+            NkAdd saudara = CreateNode(parents, nama2, usia2, gender2, isHidup2);
+            NkAdd temp = parents->FirstSon;
+            if (temp == NULL) {
+                parents->FirstSon = saudara;
+            } else {
+                while (temp->NextBrother) temp = temp->NextBrother;
+                temp->NextBrother = saudara;
+            }
+            continue;
         }
+
+        // Baris tidak valid
+        printf("Peringatan: Baris tidak valid di file: %s", line);
     }
 
     fclose(file);
 }
-
 
 void printFromFile(const char* location) {
     FILE *file;

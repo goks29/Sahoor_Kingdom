@@ -8,51 +8,53 @@ boolean IsEmptyTree (NTree* T){
     return (T->root == NULL);
 }
 
-void AddChild (NTree* T, NkAdd current, const char* parents, infotype name, int usia, boolean gender, boolean hidup) {
-    int i=2;
+void AddChild(NTree* T, NkAdd current, const char* parents, infotype name, int usia, boolean gender, boolean hidup) {
+    int i = 2;
 
     if (IsEmptyTree(T)) {
         printf("Tree kosong. Tidak bisa menambahkan anak tanpa leluhur.\n");
         getch();
         return;
-    } 
+    }
 
     if (current == NULL) {
-        printf("Parents '%s' tidak ditemukan.\n");
+        printf("Parents '%s' tidak ditemukan.\n", parents);
         getch();
         return;
     }
 
     if (current->Pasangan == NULL) {
-        printf("Parents '%s' belum menikah. Tidak bisa menambahkan anak.\n");
+        printf("Parents '%s' belum menikah. Tidak bisa menambahkan anak.\n", current->Identitas.Nama);
         getch();
         return;
     }
 
-    int usiaParents = current->Identitas.Usia;
-    int usiaPasangParents = current->Pasangan->Identitas.Usia;
-    if ((usiaParents - usia < 18) || (usiaPasangParents - usia < 18)) {
+    // Tentukan siapa ayah dan ibu berdasarkan gender
+    NkAdd ayah = (current->Identitas.Gender == 1) ? current : current->Pasangan;
+    NkAdd ibu = (current->Identitas.Gender == 0) ? current : current->Pasangan;
+
+    // Validasi usia anak dibanding orang tua
+    if ((ayah->Identitas.Usia - usia < 18) || (ibu->Identitas.Usia - usia < 18)) {
         printf("\nUsia anak tidak boleh lebih besar dari orang tua ! Harus 18 tahun dibawah usia orang tua.\n");
         getch();
         return;
     }
 
+    NkAdd newChild = CreateNode(ayah, name, usia, gender, hidup);
 
-    NkAdd newChild = CreateNode(current, name, usia, gender, hidup);
-    if (current->FirstSon == NULL) {
-        current->FirstSon = newChild;
-        current->Pasangan->FirstSon = newChild;
-        printf("%s merupakan first son dari %s dan %s\n",name,current->Identitas.Nama,current->Pasangan->Identitas.Nama);
+    if (ayah->FirstSon == NULL) {
+        ayah->FirstSon = newChild;
+        ibu->FirstSon = newChild;  // sinkronisasi anak di pasangan
+        printf("\n%s merupakan first son dari %s dan %s\n", name, ayah->Identitas.Nama, ibu->Identitas.Nama);
     } else {
-        NkAdd temp = current->FirstSon;
+        NkAdd temp = ayah->FirstSon;
         while (temp->NextBrother != NULL) {
             temp = temp->NextBrother;
             i++;
         }
         temp->NextBrother = newChild;
-        printf("%s merupakan anak ke-%d dari %s dan %s\n\n",name,i,current->Identitas.Nama,current->Pasangan->Identitas.Nama);
-    } 
-    
+        printf("\n%s merupakan anak ke-%d dari %s dan %s\n", name, i, ayah->Identitas.Nama, ibu->Identitas.Nama);
+    }
 }
 
 NkAdd SearchNode (NkAdd curNode, const char* name) {
@@ -123,72 +125,46 @@ NkAdd SearchNodeUniversal(NkAdd curNode, const char* name, NkAdd* visited, int* 
 void PrintTreeRek(NkAdd node, int depth) {
     if (node == NULL) return;
 
-    // Cetak indentasi
+    // Cetak node saat ini
     for (int i = 0; i < depth; i++) printf("  ");
-
-    // Cetak node utama dengan pasangan jika ada
     if (node->Pasangan) {
         printf("* %s (%d th) (%s) -> * %s (%d th) (%s)\n",
-            node->Identitas.Nama,
-            node->Identitas.Usia,
-            node->Identitas.Gender ? "L" : "P",
-            node->Pasangan->Identitas.Nama,
-            node->Pasangan->Identitas.Usia,
-            node->Pasangan->Identitas.Gender ? "L" : "P");
+               node->Identitas.Nama,
+               node->Identitas.Usia,
+               node->Identitas.Gender ? "L" : "P",
+               node->Pasangan->Identitas.Nama,
+               node->Pasangan->Identitas.Usia,
+               node->Pasangan->Identitas.Gender ? "L" : "P");
     } else {
         printf("* %s (%d th) (%s) (Belum ada pasangan)\n",
-            node->Identitas.Nama,
-            node->Identitas.Usia,
-            node->Identitas.Gender ? "L" : "P");
+               node->Identitas.Nama,
+               node->Identitas.Usia,
+               node->Identitas.Gender ? "L" : "P");
     }
 
-    // Anak-anak (rekursif)
+    // Cetak anak-anak
     if (node->FirstSon) {
         for (int i = 0; i < depth; i++) printf("  ");
         printf("anak:\n");
-
         NkAdd child = node->FirstSon;
         while (child) {
-            PrintTreeRek(child, depth + 1);  // Rekursif, anak dan pasangannya juga dicetak
+            PrintTreeRek(child, depth + 1);
             child = child->NextBrother;
         }
     }
 
-    // Keluarga pasangan tetap sama seperti sebelumnya
+    // Cetak keluarga pasangan (jika ada)
     if (node->Pasangan && node->Pasangan->Parents) {
         printf("\n");
         for (int i = 0; i < depth; i++) printf("  ");
         printf("Keluarga dari pasangan '%s':\n", node->Pasangan->Identitas.Nama);
 
-        NkAdd parents = node->Pasangan->Parents;
-
-        if (parents && parents->Pasangan) {
-            for (int i = 0; i < depth + 1; i++) printf("  ");
-            printf("* %s (%d th) (%s) -> * %s (%d th) (%s)\n",
-                parents->Identitas.Nama,
-                parents->Identitas.Usia,
-                parents->Identitas.Gender ? "L" : "P",
-                parents->Pasangan->Identitas.Nama,
-                parents->Pasangan->Identitas.Usia,
-                parents->Pasangan->Identitas.Gender ? "L" : "P");
-
-            if (parents->FirstSon) {
-                for (int i = 0; i < depth + 1; i++) printf("  ");
-                printf("anak:\n");
-
-                NkAdd child = parents->FirstSon;
-                while (child) {
-                    for (int i = 0; i < depth + 2; i++) printf("  ");
-                    printf("* %s (%d th) (%s)\n",
-                        child->Identitas.Nama,
-                        child->Identitas.Usia,
-                        child->Identitas.Gender ? "L" : "P");
-                    child = child->NextBrother;
-                }
-            }
-        }
+        // Cetak orang tua pasangan secara rekursif
+        PrintTreeRek(node->Pasangan->Parents, depth + 1);
     }
 }
+
+
 
 
 
