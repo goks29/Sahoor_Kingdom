@@ -93,7 +93,7 @@ NkAdd SearchNodeUniversal(NkAdd curNode, const char* name, NkAdd* visited, int* 
 
     visited[(*count)++] = curNode;
 
-    printf("Mencari di node: %s\n", curNode->Identitas.Nama);
+    // printf("Mencari di node: %s\n", curNode->Identitas.Nama);
 
     if (strcmp(curNode->Identitas.Nama, name) == 0) {
         return curNode;

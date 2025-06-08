@@ -15,6 +15,8 @@ void InsertMember(NTree* tree, char* parentName);
 
 void InsertKeluargaPasangan (NTree* tree, char* PartnerName);
 
+void CetakHubungan(int gen1, int gen2, char* namaP1, char* namaP2, NkAdd lastCommon);
+
 void CheckHubunganKeluarga(NTree tree);
 
 void WarisHarta(NTree tree,char* parentName);

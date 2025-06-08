@@ -341,11 +341,49 @@ void InsertKeluargaPasangan(NTree* tree, char* PartnerName) {
     getch();
 }
 
+void CetakHubungan(int gen1, int gen2, char* namaP1, char* namaP2, NkAdd lastCommon) {
+    printf("Hubungan antara %s dan %s: ", namaP1, namaP2);
+    
+    if (lastCommon == NULL) {
+        printf("Tidak ada hubungan keluarga langsung atau data tidak lengkap.\n");
+        return;
+    }
+
+    if (gen1 == 0 && gen2 == 1) {
+        printf("Orang tua (%s) dan anak (%s).\n", namaP1, namaP2);
+    } else if (gen1 == 1 && gen2 == 0) {
+        printf("Anak (%s) dan orang tua (%s).\n", namaP1, namaP2);
+    } else if (gen1 == 0 && gen2 == 2) {
+        printf("Kakek/nenek (%s) dan cucu (%s).\n", namaP1, namaP2);
+    } else if (gen1 == 2 && gen2 == 0) {
+        printf("Cucu (%s) dan kakek/nenek (%s).\n", namaP1, namaP2);
+    } else if (gen1 == 0 && gen2 == 3) {
+        printf("Kakek/nenek buyut (%s) dan cicit (%s).\n", namaP1, namaP2);
+    } else if (gen1 == 3 && gen2 == 0) {
+        printf("Cicit (%s) dan kakek/nenek buyut (%s).\n", namaP2, namaP1);
+    } else if (gen1 == 1 && gen2 == 1) {
+        printf("Saudara kandung (leluhur bersama: %s).\n", lastCommon->Identitas.Nama);
+    } else if (gen1 == 1 && gen2 == 2) {
+        printf("Paman/bibi (%s) dan keponakan (%s).\n", namaP1, namaP2);
+    } else if (gen1 == 2 && gen2 == 1) {
+        printf("Keponakan (%s) dan paman/bibi (%s).\n", namaP1, namaP2);
+    } else if (gen1 == 2 && gen2 == 2) {
+        printf("Sepupu pertama (leluhur bersama: %s).\n", lastCommon->Identitas.Nama);
+    } else if (gen1 == 3 && gen2 == 3) {
+        printf("Sepupu kedua (leluhur bersama: %s).\n", lastCommon->Identitas.Nama);
+    } else if (gen1 == gen2) {
+        printf("Sepupu ke-%d (leluhur bersama: %s).\n", gen1 - 1, lastCommon->Identitas.Nama);
+    } else {
+        printf("Kerabat jauh (jarak generasi %d dan %d, leluhur bersama: %s).\n", 
+               gen1, gen2, lastCommon->Identitas.Nama);
+    }
+}
+
 void CheckHubunganKeluarga(NTree tree) {
     Stack P1, P2;
     NkAdd NPerson1, NPerson2;
     NkAdd Connection1, Connection2;
-    NkAdd visited[1000];
+    NkAdd visited[1000] = {0};
     char nameP1[50], nameP2[50];
     int gen1 = 0, gen2 = 0, visitedCount = 0;
 
@@ -353,13 +391,14 @@ void CheckHubunganKeluarga(NTree tree) {
     InitStack(&P2);
 
     // Input nama node
-    printf("Masukan nama node yang akan dibandingkan (1) : ");
+    printf("Masukkan nama node yang akan dibandingkan (1): ");
     scanf(" %[^\n]", nameP1);
     NPerson1 = SearchNodeUniversal(tree.root, nameP1, visited, &visitedCount);
 
     visitedCount = 0;
+    memset(visited, 0, sizeof(visited));
 
-    printf("Masukan nama node yang akan dibandingkan (2) : ");
+    printf("Masukkan nama node yang akan dibandingkan (2): ");
     scanf(" %[^\n]", nameP2);
     NPerson2 = SearchNodeUniversal(tree.root, nameP2, visited, &visitedCount);
 
@@ -369,24 +408,127 @@ void CheckHubunganKeluarga(NTree tree) {
         return;
     }
 
-    // Pasangan langsung
+    // Pemeriksaan hubungan langsung: Pasangan
     if ((NPerson1->Pasangan && strcmp(NPerson1->Pasangan->Identitas.Nama, nameP2) == 0) ||
         (NPerson2->Pasangan && strcmp(NPerson2->Pasangan->Identitas.Nama, nameP1) == 0)) {
-        printf("\n%s dan %s adalah pasangan langsung.\n", nameP1, nameP2);
+        printf("\n%s dan %s adalah pasangan.\n", nameP1, nameP2);
         printf("Hubungan: Pasangan\n");
         getch();
         return;
     }
 
-    if ((NPerson1->Pasangan && NPerson1->Pasangan == NPerson2->Parents) || (NPerson1->Pasangan && NPerson1->Pasangan == NPerson2->Parents->Pasangan)) {
-        printf("\n%s adalah mertua dari %s\n", nameP2, nameP1);
+    // Pemeriksaan hubungan orang tua-anak melalui FirstSon
+    if (NPerson1->FirstSon) {
+        NkAdd child = NPerson1->FirstSon;
+        while (child != NULL) {
+            if (strcmp(child->Identitas.Nama, nameP2) == 0) {
+                printf("\n%s adalah orang tua dari %s.\n", nameP1, nameP2);
+                getch();
+                return;
+            }
+            child = child->NextBrother;
+        }
+    }
+    if (NPerson2->FirstSon) {
+        NkAdd child = NPerson2->FirstSon;
+        while (child != NULL) {
+            if (strcmp(child->Identitas.Nama, nameP1) == 0) {
+                printf("\n%s adalah orang tua dari %s.\n", nameP2, nameP1);
+                getch();
+                return;
+            }
+            child = child->NextBrother;
+        }
+    }
+
+    // Pemeriksaan hubungan orang tua-anak melalui Parents
+    if (NPerson1->Parents && strcmp(NPerson1->Parents->Identitas.Nama, nameP2) == 0) {
+        printf("\n%s adalah orang tua dari %s.\n", nameP2, nameP1);
         getch();
-        return; 
+        return;
+    }
+    if (NPerson2->Parents && strcmp(NPerson2->Parents->Identitas.Nama, nameP1) == 0) {
+        printf("\n%s adalah orang tua dari %s.\n", nameP1, nameP2);
+        getch();
+        return;
+    }
+
+    // Pemeriksaan hubungan mertua
+    if (NPerson1->Pasangan && NPerson1->Pasangan->Parents &&
+        (strcmp(NPerson1->Pasangan->Parents->Identitas.Nama, nameP2) == 0 ||
+         (NPerson1->Pasangan->Parents->Pasangan &&
+          strcmp(NPerson1->Pasangan->Parents->Pasangan->Identitas.Nama, nameP2) == 0))) {
+        printf("\n%s adalah mertua dari %s.\n", nameP2, nameP1);
+        getch();
+        return;
+    }
+    if (NPerson2->Pasangan && NPerson2->Pasangan->Parents &&
+        (strcmp(NPerson2->Pasangan->Parents->Identitas.Nama, nameP1) == 0 ||
+         (NPerson2->Pasangan->Parents->Pasangan &&
+          strcmp(NPerson2->Pasangan->Parents->Pasangan->Identitas.Nama, nameP1) == 0))) {
+        printf("\n%s adalah mertua dari %s.\n", nameP1, nameP2);
+        getch();
+        return;
+    }
+
+    // Pemeriksaan hubungan menantu
+    if (NPerson1->FirstSon && NPerson1->FirstSon->Pasangan &&
+        strcmp(NPerson1->FirstSon->Pasangan->Identitas.Nama, nameP2) == 0) {
+        printf("\n%s adalah menantu dari %s.\n", nameP2, nameP1);
+        getch();
+        return;
+    }
+    if (NPerson2->FirstSon && NPerson2->FirstSon->Pasangan &&
+        strcmp(NPerson2->FirstSon->Pasangan->Identitas.Nama, nameP1) == 0) {
+        printf("\n%s adalah menantu dari %s.\n", nameP1, nameP2);
+        getch();
+        return;
+    }
+
+    // Pemeriksaan hubungan saudara ipar
+    if (NPerson1->Pasangan && NPerson1->Pasangan->Parents) {
+        NkAdd sibling = NPerson1->Pasangan->Parents->FirstSon;
+        while (sibling != NULL) {
+            if (strcmp(sibling->Identitas.Nama, nameP2) == 0) {
+                printf("\n%s adalah saudara ipar dari %s.\n", nameP2, nameP1);
+                getch();
+                return;
+            }
+            sibling = sibling->NextBrother;
+        }
+    }
+    if (NPerson2->Pasangan && NPerson2->Pasangan->Parents) {
+        NkAdd sibling = NPerson2->Pasangan->Parents->FirstSon;
+        while (sibling != NULL) {
+            if (strcmp(sibling->Identitas.Nama, nameP1) == 0) {
+                printf("\n%s adalah saudara ipar dari %s.\n", nameP1, nameP2);
+                getch();
+                return;
+            }
+            sibling = sibling->NextBrother;
+        }
     }
 
     // Isi stack untuk penelusuran ke leluhur
     NkAdd temp1 = NPerson1;
     NkAdd temp2 = NPerson2;
+
+    // Jika NPerson1 adalah pasangan, gunakan orang tua pasangannya
+    if (NPerson1->Pasangan && NPerson1->Pasangan->Parents) {
+        temp1 = NPerson1->Pasangan->Parents;
+        gen1 = 1; // Menantu satu generasi di bawah orang tua pasangan
+    } else if (temp1->Parents) {
+        temp1 = temp1->Parents;
+        gen1 = 1;
+    }
+
+    if (NPerson2->Pasangan && NPerson2->Pasangan->Parents) {
+        temp2 = NPerson2->Pasangan->Parents;
+        gen2 = 1;
+    } else if (temp2->Parents) {
+        temp2 = temp2->Parents;
+        gen2 = 1;
+    }
 
     while (temp1 != NULL) {
         Push(&P1, temp1);
@@ -398,6 +540,7 @@ void CheckHubunganKeluarga(NTree tree) {
         temp2 = temp2->Parents;
     }
 
+    // Cari leluhur bersama
     NkAdd LastCommon = NULL;
     while (!IsEmptyStack(&P1) && !IsEmptyStack(&P2)) {
         Connection1 = Pop(&P1);
@@ -410,7 +553,7 @@ void CheckHubunganKeluarga(NTree tree) {
         }
     }
 
-    // Hitung sisa untuk generasi
+    // Hitung jarak generasi
     while (!IsEmptyStack(&P1)) {
         Pop(&P1);
         gen1++;
@@ -429,29 +572,8 @@ void CheckHubunganKeluarga(NTree tree) {
 
     printf("Jarak generasi dari %s ke leluhur: %d\n", nameP1, gen1);
     printf("Jarak generasi dari %s ke leluhur: %d\n", nameP2, gen2);
-
-    // Tentukan hubungan
-    printf("Hubungan antara %s dan %s: ", nameP1, nameP2);
     
-    if (gen1 == 0 && gen2 == 1) {
-        printf("Orang tua dan anak.\n");
-    } else if (gen1 == 1 && gen2 == 0) {
-        printf("Anak dan orang tua.\n");
-    } else if (gen1 == 0 && gen2 == 2) {
-        printf("Kakek/nenek dan cucu.\n");
-    } else if (gen1 == 2 && gen2 == 0) {
-        printf("Cucu dan kakek/nenek.\n");
-    } else if (gen1 == 1 && gen2 == 1) {
-        printf("Saudara kandung.\n");
-    } else if ((gen1 == 1 && gen2 == 2) || (gen1 == 2 && gen2 == 1)) {
-        printf("Paman/Bibi dan Keponakan.\n");
-    } else if (gen1 == 2 && gen2 == 2) {
-        printf("Sepupu.\n");
-    } else if (gen1 == gen2) {
-        printf("Sepupu jauh atau kerabat satu generasi lebih jauh.\n");
-    } else {
-        printf("Kerabat jauh atau beda generasi.\n");
-    }
+    CetakHubungan(gen1, gen2, nameP1, nameP2, LastCommon);
     getch();
 }
 
