@@ -32,7 +32,7 @@ int main() {
         printf("\n==== Menu Silsilah Keluarga ====\n");
         printf("1. Tambah Pasangan\n");
         printf("2. Tambah Anak\n");
-        printf("3. Cek Koneksi Keluarga\n");
+        printf("3. Cek Hubungan Keluarga\n");
         printf("4. Waris Harta\n");
         printf("5. Tambahkan keluarga pasangan\n");
         printf("6. Print Tree\n");
@@ -46,9 +46,9 @@ int main() {
                 system("cls");
                 printf("\n=======================================\n");
                 printf("\n            TAMBAH PASANGAN            \n");
-                printf("\n=======================================\n\n");
+                printf("\n=======================================\n");
                 printf("\n");
-                PrintSilsilah(tree);
+                PrintLevel(tree.root);
                 printf("\n");
                 printf("Masukkan nama yang ingin diberi pasangan : ");
                 scanf(" %[^\n]", nama);
@@ -61,9 +61,9 @@ int main() {
                 system("cls");
                 printf("\n=======================================\n");
                 printf("\n              TAMBAH ANAK              \n");
-                printf("\n=======================================\n\n");
+                printf("\n=======================================\n");
                 printf("\n");
-                PrintSilsilah(tree);
+                PrintLevel(tree.root);
                 printf("\n");
                 printf("Masukkan nama orang tua : ");
                 scanf(" %[^\n]", nama);
@@ -76,8 +76,8 @@ int main() {
                 system("cls");
                 printFromFile("Assets/CekAnggota.txt");
                 printf("\n==========================================================\n");
-                printf("\n                CEK KONEKSI ANGGOTA KELUARGA\n");
-                printf("\n==========================================================\n\n");
+                printf("\n                CEK HUBUNGAN ANGGOTA KELUARGA\n");
+                printf("\n==========================================================\n");
                 printf("\n");
                 PrintSilsilah(tree);
                 printf("\n");
@@ -92,9 +92,9 @@ int main() {
                 printFromFile("assets/PenerusHarta.txt");
                 printf("\n                              ===============================================================\n");
                 printf("\n                                                        PENERUS HARTA\n");
-                printf("\n                              ===============================================================\n\n");
+                printf("\n                              ===============================================================\n");
 
-                PrintSilsilah(tree);
+                PrintLevel(tree.root);
                 printf("\n");
                 printf("masukan nama node yang meninggal : ");
                 scanf(" %[^\n]",NodeMati);
@@ -104,11 +104,10 @@ int main() {
                 system("Pause");
                 break;
 
-
             case 5:
                 system("cls");
                 printf("\n");
-                PrintSilsilah(tree);
+                PrintLevel(tree.root);
                 printf("\n");
                 printf("Masukan nama pasangan yang ingin diisi data keluarga : ");
                 scanf(" %[^\n]", nama);
@@ -118,6 +117,8 @@ int main() {
                 system("cls");
                 printf("\n\n");
                 PrintSilsilah(tree);
+                printf("\nKetik apapun untuk melanjutkan.\n");
+                getch();
             case 0:
                 printf("Terima kasih!\n");
                 break;

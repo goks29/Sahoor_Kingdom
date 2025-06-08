@@ -23,7 +23,7 @@ void TimeSkip(NkAdd node, int year);
 
 void PrintSilsilah(NTree tree);
 
-void CetakSilsilahPerGenerasi(NkAdd node, int level, boolean* adaYangDicetak);
+void CetakSilsilahPerGenerasi(NkAdd node, int level, boolean* adaYangDicetak, NkAdd root);
 
 void PrintLevel(NkAdd root);
 
@@ -39,6 +39,7 @@ void printFromFile(const char* location);
 
 int RangeUsiaAnak (NkAdd Ortu);
 
+boolean IsDescendantOf(NkAdd node, NkAdd root);
 
 
 

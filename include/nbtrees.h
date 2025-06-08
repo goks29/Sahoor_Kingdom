@@ -20,7 +20,7 @@ void AddChild (NTree* T, NkAdd current, const char* parents, infotype name, int 
 
 NkAdd SearchNode (NkAdd curNode, const char* name);
 
-int isVisited(NkAdd* visited, int count, NkAdd node);
+boolean isVisited(NkAdd* visited, int count, NkAdd node);
 
 NkAdd SearchNodeUniversal(NkAdd curNode, const char* name, NkAdd* visited, int* count);
 

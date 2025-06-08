@@ -279,17 +279,18 @@ void InsertKeluargaPasangan (NTree* tree, char* PartnerName) {
 
     if (jumlahSaudara > 0) {
         NkAdd SaudaraTerakhir = Node->Pasangan;
-
+        int min = 0;
         for (int i = 0; i < jumlahSaudara; i++) {
+            min++;
             char namaSaudara[50];
             int usiaSau, genderSau, hidupSau;
             printf("\nMasukan nama saudara ke-%d : ", i+1);
             scanf(" %[^\n]", namaSaudara);
             getchar();
 
-            printf("Masukkan usia (range usia %d - 1 tahun) : ",SaudaraTerakhir->Identitas.Usia - 1);
+            printf("Masukkan usia (range usia %d - 1 tahun) : ",SaudaraTerakhir->Identitas.Usia - min);
             scanf("%d", &usiaSau);
-            if (usiaSau > SaudaraTerakhir->Identitas.Usia - 1) {
+            if (usiaSau > SaudaraTerakhir->Identitas.Usia - min) {
                 printf("\nUsia saudara harus dibawah umur kakak nya.\n");
                 getch();
                 return;
@@ -671,8 +672,11 @@ void PrintSilsilah(NTree tree) {
     }
 }
 
-void CetakSilsilahPerGenerasi(NkAdd node, int level, boolean* adaYangDicetak) {
+void CetakSilsilahPerGenerasi(NkAdd node, int level, boolean* adaYangDicetak, NkAdd root) {
     if (node == NULL) return;
+
+    // Hanya cetak node yang masih dalam silsilah root
+    if (!IsDescendantOf(node, root) && node != root) return;
 
     if (level == 1) {
         *adaYangDicetak = true;
@@ -692,8 +696,12 @@ void CetakSilsilahPerGenerasi(NkAdd node, int level, boolean* adaYangDicetak) {
         }
     }
 
-    CetakSilsilahPerGenerasi(node->FirstSon, level - 1, adaYangDicetak);
-    CetakSilsilahPerGenerasi(node->NextBrother, level, adaYangDicetak);
+    CetakSilsilahPerGenerasi(node->FirstSon, level - 1, adaYangDicetak, root);
+
+    // Hanya cetak NextBrother kalau memang anak dari orang tua yang valid (masih dalam silsilah root)
+    if (node->Parents != NULL && IsDescendantOf(node->Parents, root)) {
+        CetakSilsilahPerGenerasi(node->NextBrother, level, adaYangDicetak, root);
+    }
 }
 
 void PrintLevel(NkAdd root) {
@@ -707,7 +715,7 @@ void PrintLevel(NkAdd root) {
     while (adaYangDicetak) {
         adaYangDicetak = false;
         printf("\t\tGenerasi %d:\n", currentLevel);
-        CetakSilsilahPerGenerasi(root, currentLevel, &adaYangDicetak);
+        CetakSilsilahPerGenerasi(root, currentLevel, &adaYangDicetak, root);  // root sebagai filter
         printf("\n");
         currentLevel++;
     }
@@ -739,54 +747,84 @@ void getFamilyFromFile(NTree* tree) {
 
     char line[256];
     while (fgets(line, sizeof(line), file)) {
-        char tipe[30], nama1[50], nama2[50];
+        char nama1[50], nama2[50];
         int usia1, gender1, usia2, gender2;
 
+        // LELUHUR
         if (sscanf(line, "LELUHUR, %[^,], %d, %d", nama1, &usia1, &gender1) == 3) {
             NkAdd root = CreateNode(NULL, nama1, usia1, gender1, 1);
             tree->root = root;
         }
+        // PASANGAN
         else if (sscanf(line, "PASANGAN, %[^,], %[^,], %d, %d", nama1, nama2, &usia2, &gender2) == 4) {
-            NkAdd node = SearchNode(tree->root, nama1);
+            int visitedCount = 0;
+            NkAdd visited[1000];
+            NkAdd node = SearchNodeUniversal(tree->root, nama1, visited, &visitedCount);
             if (node) {
                 NkAdd pasangan = CreateNode(NULL, nama2, usia2, gender2, 1);
                 node->Pasangan = pasangan;
                 pasangan->Pasangan = node;
             }
         }
+        // ANAK
         else if (sscanf(line, "ANAK, %[^,], %[^,], %d, %d", nama1, nama2, &usia2, &gender2) == 4) {
-            NkAdd parent = SearchNode(tree->root, nama1);
+            int visitedCount = 0;
+            NkAdd visited[1000];
+            NkAdd parent = SearchNodeUniversal(tree->root, nama1, visited, &visitedCount);
             if (parent) {
                 AddChild(tree, parent, nama1, nama2, usia2, gender2, 1);
             }
         }
-        else if (sscanf(line, "KELUARGA_PASANGAN, %[^,], %[^,], %d, %d, %[^,], %d, %d",
-                        nama1, nama2, &usia1, &gender1, nama2 + 30, &usia2, &gender2) == 7) {
-            NkAdd pasangan = SearchNode(tree->root, nama1);
+    }
+
+    // Reset file pointer ke awal
+    rewind(file); 
+
+    while (fgets(line, sizeof(line), file)) {
+        char nama1[50], nama2[50], nama_ayah[50], nama_ibu[50];
+        int usia1, gender1, usia2, gender2;
+
+        // KELUARGA_PASANGAN
+        if (sscanf(line, "KELUARGA_PASANGAN, %[^,], %[^,], %d, %d, %[^,], %d, %d",
+                   nama1, nama_ayah, &usia1, &gender1, nama_ibu, &usia2, &gender2) == 7) {
+            int visitedCount = 0;
+            NkAdd visited[1000];
+            NkAdd pasangan = SearchNodeUniversal(tree->root, nama1, visited, &visitedCount);
             if (pasangan && pasangan->Pasangan) {
-                NkAdd ayah = CreateNode(NULL, nama2, usia1, gender1, 1);
-                NkAdd ibu = CreateNode(NULL, nama2 + 30, usia2, gender2, 1);
+                NkAdd ayah = CreateNode(NULL, nama_ayah, usia1, gender1, 1);
+                NkAdd ibu = CreateNode(NULL, nama_ibu, usia2, gender2, 1);
                 ayah->Pasangan = ibu;
                 ibu->Pasangan = ayah;
+
                 pasangan->Pasangan->Parents = ayah;
                 ayah->FirstSon = pasangan->Pasangan;
             }
         }
+        // SAUDARA_PASANGAN
         else if (sscanf(line, "SAUDARA_PASANGAN, %[^,], %[^,], %d, %d", nama1, nama2, &usia2, &gender2) == 4) {
-            NkAdd pasangan = SearchNode(tree->root, nama1);
+            int visitedCount = 0;
+            NkAdd visited[1000];
+            NkAdd pasangan = SearchNodeUniversal(tree->root, nama1, visited, &visitedCount);
             if (pasangan && pasangan->Pasangan) {
                 NkAdd parents = pasangan->Pasangan->Parents;
-                NkAdd saudara = CreateNode(parents, nama2, usia2, gender2, 1);
-                NkAdd current = pasangan->Pasangan;
-                while (current->NextBrother != NULL)
-                    current = current->NextBrother;
-                current->NextBrother = saudara;
+                if (parents) {
+                    NkAdd saudara = CreateNode(parents, nama2, usia2, gender2, 1);
+                    NkAdd current = parents->FirstSon;
+                    if (current == NULL) {
+                        parents->FirstSon = saudara;
+                    } else {
+                        while (current->NextBrother != NULL)
+                            current = current->NextBrother;
+                        current->NextBrother = saudara;
+                    }
+                }
             }
         }
     }
 
     fclose(file);
 }
+
 
 void printFromFile(const char* location) {
     FILE *file;
@@ -828,4 +866,14 @@ int RangeUsiaAnak (NkAdd Ortu) {
         hasil = UsiaOrtu - 18;
         return hasil;
     }
+}
+
+boolean IsDescendantOf(NkAdd node, NkAdd root) {
+    NkAdd current = node->Parents;
+    while (current != NULL) {
+        if (current == root)
+            return true;
+        current = current->Parents;
+    }
+    return false;
 }

@@ -77,46 +77,45 @@ NkAdd SearchNode (NkAdd curNode, const char* name) {
     
 }
 
-int isVisited(NkAdd* visited, int count, NkAdd node) {
+boolean isVisited(NkAdd* visited, int count, NkAdd node) {
     for (int i = 0; i < count; i++) {
-        if (visited[i] == node) return 1;
+        if (visited[i] == node) return true;
     }
-    return 0;
+    return false;
 }
 
 NkAdd SearchNodeUniversal(NkAdd curNode, const char* name, NkAdd* visited, int* count) {
-    if (curNode == NULL || (*count >= 1000) || isVisited(visited,*count,NULL)) {
+    if (curNode == NULL || *count >= 1000 || isVisited(visited, *count, curNode)) {
         return NULL;
     }
 
     visited[(*count)++] = curNode;
 
-    if (strcmp(curNode->Identitas.Nama,name) == 0 ) {
+    printf("Mencari di node: %s\n", curNode->Identitas.Nama);
+
+    if (strcmp(curNode->Identitas.Nama, name) == 0) {
         return curNode;
     }
 
     NkAdd found = NULL;
 
-    
-    found = SearchNodeUniversal(curNode->Pasangan,name,visited,count);
-    if (found) {
-        return found;
+    // 1. Pasangan
+    if (curNode->Pasangan != NULL) {
+        found = SearchNodeUniversal(curNode->Pasangan, name, visited, count);
+        if (found) return found;
     }
 
-    found = SearchNodeUniversal(curNode->FirstSon,name,visited,count);
-    if (found) {
-        return found;
-    }
+    // 2. Anak (FirstSon)
+    found = SearchNodeUniversal(curNode->FirstSon, name, visited, count);
+    if (found) return found;
 
-    found = SearchNodeUniversal(curNode->NextBrother,name,visited,count);
-    if (found) {
-        return found;
-    }
-    
-    found = SearchNodeUniversal(curNode->Parents,name,visited,count);
-    if (found) {
-        return found;
-    }
+    // 3. Saudara kandung (NextBrother)
+    found = SearchNodeUniversal(curNode->NextBrother, name, visited, count);
+    if (found) return found;
+
+    // 4. Orang tua
+    found = SearchNodeUniversal(curNode->Parents, name, visited, count);
+    if (found) return found;
 
     return NULL;
 }
@@ -127,37 +126,69 @@ void PrintTreeRek(NkAdd node, int depth) {
     // Cetak indentasi
     for (int i = 0; i < depth; i++) printf("  ");
 
-    // Cetak node utama
-    printf("%s (%d th) [%s, %s]\n",
-        node->Identitas.Nama,
-        node->Identitas.Usia,
-        node->Identitas.Gender ? "Pria" : "Wanita",
-        node->Identitas.IsHidup ? "Hidup" : "Meninggal");
-
-    // Pasangan
+    // Cetak node utama dengan pasangan jika ada
     if (node->Pasangan) {
-        for (int i = 0; i < depth + 1; i++) printf("  ");
-        printf("~ Pasangan: %s (%d th) [%s, %s]\n",
+        printf("* %s (%d th) (%s) -> * %s (%d th) (%s)\n",
+            node->Identitas.Nama,
+            node->Identitas.Usia,
+            node->Identitas.Gender ? "L" : "P",
             node->Pasangan->Identitas.Nama,
             node->Pasangan->Identitas.Usia,
-            node->Pasangan->Identitas.Gender ? "Pria" : "Wanita",
-            node->Pasangan->Identitas.IsHidup ? "Hidup" : "Meninggal");
+            node->Pasangan->Identitas.Gender ? "L" : "P");
+    } else {
+        printf("* %s (%d th) (%s) (Belum ada pasangan)\n",
+            node->Identitas.Nama,
+            node->Identitas.Usia,
+            node->Identitas.Gender ? "L" : "P");
     }
 
-    // Anak-anak
+    // Anak-anak (rekursif)
     if (node->FirstSon) {
+        for (int i = 0; i < depth; i++) printf("  ");
+        printf("anak:\n");
+
         NkAdd child = node->FirstSon;
         while (child) {
-            PrintTreeRek(child, depth + 2);
+            PrintTreeRek(child, depth + 1);  // Rekursif, anak dan pasangannya juga dicetak
             child = child->NextBrother;
         }
     }
 
-    //cetak keluarga dari pasangan
+    // Keluarga pasangan tetap sama seperti sebelumnya
     if (node->Pasangan && node->Pasangan->Parents) {
         printf("\n");
-        for (int i = 0; i < depth + 1; i++) printf("  ");
+        for (int i = 0; i < depth; i++) printf("  ");
         printf("Keluarga dari pasangan '%s':\n", node->Pasangan->Identitas.Nama);
-        PrintTreeRek(node->Pasangan->Parents, depth + 2);
+
+        NkAdd parents = node->Pasangan->Parents;
+
+        if (parents && parents->Pasangan) {
+            for (int i = 0; i < depth + 1; i++) printf("  ");
+            printf("* %s (%d th) (%s) -> * %s (%d th) (%s)\n",
+                parents->Identitas.Nama,
+                parents->Identitas.Usia,
+                parents->Identitas.Gender ? "L" : "P",
+                parents->Pasangan->Identitas.Nama,
+                parents->Pasangan->Identitas.Usia,
+                parents->Pasangan->Identitas.Gender ? "L" : "P");
+
+            if (parents->FirstSon) {
+                for (int i = 0; i < depth + 1; i++) printf("  ");
+                printf("anak:\n");
+
+                NkAdd child = parents->FirstSon;
+                while (child) {
+                    for (int i = 0; i < depth + 2; i++) printf("  ");
+                    printf("* %s (%d th) (%s)\n",
+                        child->Identitas.Nama,
+                        child->Identitas.Usia,
+                        child->Identitas.Gender ? "L" : "P");
+                    child = child->NextBrother;
+                }
+            }
+        }
     }
 }
+
+
+
