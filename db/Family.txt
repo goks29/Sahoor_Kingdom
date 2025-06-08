@@ -1,12 +1,9 @@
-LELUHUR, rama, 65, 1
-PASANGAN, rama, sita, 60, 0
-KELUARGA_PASANGAN, sita, dasa, 85, 1, rini, 83, 0
-SAUDARA_PASANGAN, sita, lukman, 58, 1
-ANAK, sita, arjuna, 35, 1
-ANAK, sita, bima, 32, 1
-PASANGAN, arjuna, shinta, 33, 0
-ANAK, shinta, nara, 10, 1
-ANAK, shinta, nari, 8, 0
-KELUARGA_PASANGAN, shinta, joko, 58, 1, sri, 57, 0
-SAUDARA_PASANGAN, shinta, dina, 30, 0
-SAUDARA_PASANGAN, shinta, dino, 28, 1
+LELUHUR, gok, 59, 1, 1
+PASANGAN, gok, sumin, 45, 0, 1
+ANAK, gok, google, 24, 1, 1
+KELUARGA_PASANGAN, sumin, ayam, 63, 1, ayum, 65, 0
+SAUDARA_PASANGAN, sumin, ayom, 44, 1, 1
+ANAK, sumin, google, 24, 1, 1
+PASANGAN, ayam, ayum, 65, 0, 1
+ANAK, ayam, sumin, 45, 0, 1
+ANAK, ayam, ayom, 44, 1, 1

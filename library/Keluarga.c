@@ -798,7 +798,39 @@ void WarisHarta(NTree tree,char* parentName) {
 }
 
 void TimeSkip(NkAdd node, int year) {
+    if (node == NULL || year < 0) {
+        printf("Node tidak valid atau tahun negatif.\n");
+        return;
+    }
 
+    // Inisialisasi array visited
+    NkAdd visited[1000] = {0};
+    int visitedCount = 0;
+
+    // Update usia di pohon
+    UpdateAges(node, year, visited, &visitedCount);
+
+    // Reset visited untuk pengumpulan data
+    visitedCount = 0;
+    memset(visited, 0, sizeof(visited));
+
+    // Kumpulkan data keluarga dari pohon
+    FamilyData newData[1000] = {0};
+    int newDataCount = 0;
+    CollectFamilyData(node, newData, &newDataCount, visited, &visitedCount, node);
+
+    // Baca data yang sudah ada dari file
+    FamilyData existingData[1000] = {0};
+    int existingCount = 0;
+    ReadFamilyFromFile(existingData, &existingCount);
+
+    // Perbarui data yang cocok
+    UpdateFamilyData(existingData, &existingCount, newData, newDataCount);
+
+    // Tulis kembali ke file
+    WriteFamilyToFile(existingData, existingCount);
+
+    printf("Timeskip %d tahun berhasil dilakukan. Data keluarga telah diperbarui.\n", year);
 }
 
 void PrintSilsilah(NTree tree) {
@@ -992,7 +1024,199 @@ void printFromFile(const char* location) {
     fclose(file);
 }
 
+void ReadFamilyFromFile(FamilyData* data, int* count) {
+    FILE* file = fopen("db/Family.txt", "r");
+    if (!file) {
+        printf("Gagal membuka file untuk pembacaan.\n");
+        return;
+    }
 
+    char line[256];
+    *count = 0;
+    while (fgets(line, sizeof(line), file) && *count < 1000) {
+        FamilyData* entry = &data[*count];
+        if (sscanf(line, "LELUHUR, %49[^,], %d, %d, %d",
+                   entry->nama1, &entry->usia1, &entry->gender1, &entry->isHidup1) >= 3) {
+            strcpy(entry->type, "LELUHUR");
+        } else if (sscanf(line, "PASANGAN, %49[^,], %49[^,], %d, %d, %d",
+                          entry->nama1, entry->nama2, &entry->usia2, &entry->gender2, &entry->isHidup2) >= 4) {
+            strcpy(entry->type, "PASANGAN");
+        } else if (sscanf(line, "ANAK, %49[^,], %49[^,], %d, %d, %d",
+                          entry->nama1, entry->nama2, &entry->usia2, &entry->gender2, &entry->isHidup2) >= 4) {
+            strcpy(entry->type, "ANAK");
+        } else if (sscanf(line, "KELUARGA_PASANGAN, %49[^,], %49[^,], %d, %d, %49[^,], %d, %d",
+                          entry->nama1, entry->ayahName, &entry->usia1, &entry->gender1,
+                          entry->ibuName, &entry->usia2, &entry->gender2) >= 7) {
+            strcpy(entry->type, "KELUARGA_PASANGAN");
+            entry->isHidup1 = (entry->usia1 <= 110) ? 1 : 0;
+            entry->isHidup2 = (entry->usia2 <= 110) ? 1 : 0;
+        } else if (sscanf(line, "SAUDARA_PASANGAN, %49[^,], %49[^,], %d, %d, %d",
+                          entry->nama1, entry->nama2, &entry->usia2, &entry->gender2, &entry->isHidup2) >= 4) {
+            strcpy(entry->type, "SAUDARA_PASANGAN");
+        } else {
+            printf("Baris tidak valid: %s", line);
+            continue;
+        }
+        (*count)++;
+    }
+    fclose(file);
+}
+
+void UpdateFamilyData(FamilyData* existing, int* existingCount, FamilyData* newData, int newCount) {
+    for (int i = 0; i < newCount; i++) {
+        int found = 0;
+        for (int j = 0; j < *existingCount; j++) {
+            if (strcmp(newData[i].type, existing[j].type) == 0 &&
+                strcmp(newData[i].nama1, existing[j].nama1) == 0 &&
+                (strcmp(newData[i].type, "LELUHUR") == 0 ||
+                 strcmp(newData[i].nama2, existing[j].nama2) == 0 ||
+                 (strcmp(newData[i].type, "KELUARGA_PASANGAN") == 0 &&
+                  strcmp(newData[i].ayahName, existing[j].ayahName) == 0 &&
+                  strcmp(newData[i].ibuName, existing[j].ibuName) == 0))) {
+                // Timpa data yang cocok
+                existing[j] = newData[i];
+                found = 1;
+                break;
+            }
+        }
+        if (!found && *existingCount < 1000) {
+            // Tambahkan entri baru jika tidak ditemukan
+            existing[*existingCount] = newData[i];
+            (*existingCount)++;
+        }
+    }
+}
+
+void WriteFamilyToFile(FamilyData* data, int count) {
+    FILE* file = fopen("db/Family.txt", "w");
+    if (!file) {
+        printf("Gagal membuka file untuk penulisan.\n");
+        return;
+    }
+
+    for (int i = 0; i < count; i++) {
+        if (strcmp(data[i].type, "LELUHUR") == 0) {
+            fprintf(file, "LELUHUR, %s, %d, %d, %d\n",
+                    data[i].nama1, data[i].usia1, data[i].gender1, data[i].isHidup1);
+        } else if (strcmp(data[i].type, "PASANGAN") == 0) {
+            fprintf(file, "PASANGAN, %s, %s, %d, %d, %d\n",
+                    data[i].nama1, data[i].nama2, data[i].usia2, data[i].gender2, data[i].isHidup2);
+        } else if (strcmp(data[i].type, "ANAK") == 0) {
+            fprintf(file, "ANAK, %s, %s, %d, %d, %d\n",
+                    data[i].nama1, data[i].nama2, data[i].usia2, data[i].gender2, data[i].isHidup2);
+        } else if (strcmp(data[i].type, "KELUARGA_PASANGAN") == 0) {
+            fprintf(file, "KELUARGA_PASANGAN, %s, %s, %d, %d, %s, %d, %d\n",
+                    data[i].nama1, data[i].ayahName, data[i].usia1, data[i].gender1,
+                    data[i].ibuName, data[i].usia2, data[i].gender2);
+        } else if (strcmp(data[i].type, "SAUDARA_PASANGAN") == 0) {
+            fprintf(file, "SAUDARA_PASANGAN, %s, %s, %d, %d, %d\n",
+                    data[i].nama1, data[i].nama2, data[i].usia2, data[i].gender2, data[i].isHidup2);
+        }
+    }
+    fclose(file);
+}
+
+void UpdateAges(NkAdd node, int year, NkAdd* visited, int* visitedCount) {
+    if (node == NULL || isVisited(visited, *visitedCount, node)) return;
+    if (*visitedCount >= 1000) {
+        printf("Peringatan: Terlalu banyak node dikunjungi!\n");
+        return;
+    }
+
+    visited[(*visitedCount)++] = node;
+    node->Identitas.Usia += year;
+    if (node->Identitas.Usia > 110) {
+        node->Identitas.IsHidup = 0;
+    }
+
+    UpdateAges(node->FirstSon, year, visited, visitedCount);
+    UpdateAges(node->NextBrother, year, visited, visitedCount);
+    UpdateAges(node->Pasangan, year, visited, visitedCount);
+    UpdateAges(node->Parents, year, visited, visitedCount);
+}
+
+void CollectFamilyData(NkAdd node, FamilyData* data, int* count, NkAdd* visited, int* visitedCount, NkAdd root) {
+    if (node == NULL || isVisited(visited, *visitedCount, node)) return;
+    if (*visitedCount >= 1000) {
+        printf("Peringatan: Terlalu banyak node dikunjungi!\n");
+        return;
+    }
+
+    visited[(*visitedCount)++] = node;
+
+    // Collect LELUHUR (node adalah root)
+    if (node == root) {
+        strcpy(data[*count].type, "LELUHUR");
+        strcpy(data[*count].nama1, node->Identitas.Nama);
+        data[*count].usia1 = node->Identitas.Usia;
+        data[*count].gender1 = node->Identitas.Gender;
+        data[*count].isHidup1 = node->Identitas.IsHidup;
+        (*count)++;
+    }
+
+    // Collect PASANGAN
+    if (node->Pasangan != NULL && !isVisited(visited, *visitedCount, node->Pasangan)) {
+        strcpy(data[*count].type, "PASANGAN");
+        strcpy(data[*count].nama1, node->Identitas.Nama);
+        strcpy(data[*count].nama2, node->Pasangan->Identitas.Nama);
+        data[*count].usia2 = node->Pasangan->Identitas.Usia;
+        data[*count].gender2 = node->Pasangan->Identitas.Gender;
+        data[*count].isHidup2 = node->Pasangan->Identitas.IsHidup;
+        (*count)++;
+    }
+
+    // Collect ANAK
+    if (node->FirstSon != NULL) {
+        NkAdd child = node->FirstSon;
+        while (child != NULL) {
+            strcpy(data[*count].type, "ANAK");
+            strcpy(data[*count].nama1, node->Identitas.Nama);
+            strcpy(data[*count].nama2, child->Identitas.Nama);
+            data[*count].usia2 = child->Identitas.Usia;
+            data[*count].gender2 = child->Identitas.Gender;
+            data[*count].isHidup2 = child->Identitas.IsHidup;
+            (*count)++;
+            child = child->NextBrother;
+        }
+    }
+
+    // Collect KELUARGA_PASANGAN
+    if (node->Pasangan != NULL && node->Pasangan->Parents != NULL) {
+        NkAdd ayah = node->Pasangan->Parents;
+        NkAdd ibu = node->Pasangan->Parents->Pasangan;
+        strcpy(data[*count].type, "KELUARGA_PASANGAN");
+        strcpy(data[*count].nama1, node->Pasangan->Identitas.Nama);
+        strcpy(data[*count].ayahName, ayah->Identitas.Nama);
+        data[*count].usia1 = ayah->Identitas.Usia;
+        data[*count].gender1 = ayah->Identitas.Gender;
+        data[*count].isHidup1 = ayah->Identitas.IsHidup;
+        strcpy(data[*count].ibuName, ibu->Identitas.Nama);
+        data[*count].usia2 = ibu->Identitas.Usia;
+        data[*count].gender2 = ibu->Identitas.Gender;
+        data[*count].isHidup2 = ibu->Identitas.IsHidup;
+        (*count)++;
+    }
+
+    // Collect SAUDARA_PASANGAN
+    if (node->Parents != NULL && node->NextBrother != NULL) {
+        NkAdd sibling = node->NextBrother;
+        while (sibling != NULL) {
+            strcpy(data[*count].type, "SAUDARA_PASANGAN");
+            strcpy(data[*count].nama1, node->Identitas.Nama);
+            strcpy(data[*count].nama2, sibling->Identitas.Nama);
+            data[*count].usia2 = sibling->Identitas.Usia;
+            data[*count].gender2 = sibling->Identitas.Gender;
+            data[*count].isHidup2 = sibling->Identitas.IsHidup;
+            (*count)++;
+            sibling = sibling->NextBrother;
+        }
+    }
+
+    CollectFamilyData(node->FirstSon, data, count, visited, visitedCount, root);
+    CollectFamilyData(node->NextBrother, data, count, visited, visitedCount, root);
+    CollectFamilyData(node->Pasangan, data, count, visited, visitedCount, root);
+    CollectFamilyData(node->Parents, data, count, visited, visitedCount, root);
+}
 /*fungsi pengecekan*/
 
 int RangeUsiaAnak (NkAdd Ortu) {
