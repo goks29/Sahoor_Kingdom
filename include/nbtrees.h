@@ -24,6 +24,6 @@ boolean isVisited(NkAdd* visited, int count, NkAdd node);
 
 NkAdd SearchNodeUniversal(NkAdd curNode, const char* name, NkAdd* visited, int* count);
 
-void PrintTreeRek(NkAdd node, int level);
+void PrintTreeRek(NkAdd node, int level, int last);
 
 #endif

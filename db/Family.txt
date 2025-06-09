@@ -1,7 +1,9 @@
-LELUHUR, gok, 120, 1, 1
-PASANGAN, gok, sumin, 120, 0, 1
-ANAK, gok, gaga, 102, 1, 1
-KELUARGA_PASANGAN, sumin, lee, 138, 1, min, 138, 0
-PASANGAN, gaga, gege, 39, 0, 0
-ANAK, gege, gagagaga, 21, 1, 0
-ANAK, gok, hahaha, 102, 1
+LELUHUR, gok, 140, 1, 0
+PASANGAN, gok, sumin, 140, 0, 0
+ANAK, gok, gaga, 122, 1, 0
+KELUARGA_PASANGAN, sumin, lee, 158, 1, min, 158, 0
+PASANGAN, gaga, gege, 49, 0, 0
+ANAK, gege, gagagaga, 31, 1, 0
+ANAK, gok, hahaha, 122, 1, 0
+PASANGAN, hahaha, hehehe, 39, 0, 0
+PASANGAN, gagagaga, hahahahahha, 39, 0, 0

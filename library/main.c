@@ -14,6 +14,10 @@ int main() {
     // Muat data dari file
     getDataFromFile(&tree);
 
+    system("cls");
+    printFromFile("assets/SahoorFamily.txt");
+    system("pause");
+    system("cls");
     // Jika pohon kosong, tambahkan leluhur
     if (IsEmptyTree(&tree)) {
         InsertLeluhur(&tree);

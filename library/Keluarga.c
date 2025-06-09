@@ -109,7 +109,9 @@ void InsertPasangan(NTree* tree, char* NamaNode) {
     pasangan->Pasangan = TargetNode;
     
     system("cls");
+    printFromFile("assets/Rumah.txt");
     printf("Pasangan berhasil ditambahkan dan berkeluarga");
+    getch();
 
     FILE* file = fopen("db/Family.txt","a");
 
@@ -876,7 +878,7 @@ void PrintSilsilah(NTree tree) {
     if (tree.root == NULL) {
         printf("Pohon kosong.\n");
     } else {
-        PrintTreeRek(tree.root, 0);
+        PrintTreeRek(tree.root, 0, 1);
     }
 }
 

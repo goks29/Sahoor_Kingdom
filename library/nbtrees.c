@@ -131,47 +131,65 @@ NkAdd SearchNodeUniversal(NkAdd curNode, const char* name, NkAdd* visited, int* 
     return NULL;
 }
 
-void PrintTreeRek(NkAdd node, int depth) {
+void PrintTreeRek(NkAdd node, int depth, int isLast) {
     if (node == NULL) return;
 
-    // Cetak node saat ini
-    for (int i = 0; i < depth; i++) printf("  ");
-    if (node->Pasangan) {
-        printf("* %s (%d th) (%s) -> * %s (%d th) (%s)\n",
-               node->Identitas.Nama,
-               node->Identitas.Usia,
-               node->Identitas.Gender ? "L" : "P",
+    // Buat indentasi dengan ASCII
+    for (int i = 0; i < depth - 1; i++) {
+        printf("|   ");
+    }
+
+    if (depth > 0) {
+        printf(isLast ? "`-- " : "|-- ");
+    }
+
+    // Tampilkan info node
+    printf("%s (%d th, %s) [%s]",
+           node->Identitas.Nama,
+           node->Identitas.Usia,
+           node->Identitas.Gender ? "Laki-laki" : "Perempuan",
+           node->Identitas.IsHidup ? "Hidup" : "Meninggal");
+
+    // Tampilkan pasangan jika ada
+    if (node->Pasangan != NULL) {
+        printf("  <-->  %s (%d th, %s) [%s]",
                node->Pasangan->Identitas.Nama,
                node->Pasangan->Identitas.Usia,
-               node->Pasangan->Identitas.Gender ? "L" : "P");
-    } else {
-        printf("* %s (%d th) (%s) (Belum ada pasangan)\n",
-               node->Identitas.Nama,
-               node->Identitas.Usia,
-               node->Identitas.Gender ? "L" : "P");
+               node->Pasangan->Identitas.Gender ? "Laki-laki" : "Perempuan",
+               node->Pasangan->Identitas.IsHidup ? "Hidup" : "Meninggal");
     }
 
-    // Cetak anak-anak
-    if (node->FirstSon) {
-        for (int i = 0; i < depth; i++) printf("  ");
-        printf("anak:\n");
-        NkAdd child = node->FirstSon;
-        while (child) {
-            PrintTreeRek(child, depth + 1);
-            child = child->NextBrother;
-        }
+    printf("\n");
+
+    // Hitung jumlah anak
+    NkAdd child = node->FirstSon;
+    int count = 0;
+    NkAdd temp = child;
+    while (temp) {
+        count++;
+        temp = temp->NextBrother;
     }
 
-    // Cetak keluarga pasangan (jika ada)
+    // Tampilkan anak-anak
+    int index = 0;
+    while (child) {
+        PrintTreeRek(child, depth + 1, index == count - 1);
+        child = child->NextBrother;
+        index++;
+    }
+
+    // Tampilkan keluarga pasangan
     if (node->Pasangan && node->Pasangan->Parents) {
-        printf("\n");
-        for (int i = 0; i < depth; i++) printf("  ");
-        printf("Keluarga dari pasangan '%s':\n", node->Pasangan->Identitas.Nama);
-
-        // Cetak orang tua pasangan secara rekursif
-        PrintTreeRek(node->Pasangan->Parents, depth + 1);
+        for (int i = 0; i < depth; i++) {
+            printf("|   ");
+        }
+        printf("`-- Keluarga dari pasangan '%s':\n", node->Pasangan->Identitas.Nama);
+        PrintTreeRek(node->Pasangan->Parents, depth + 1, 1);
     }
 }
+
+
+
 
 
 
