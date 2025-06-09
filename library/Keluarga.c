@@ -671,40 +671,52 @@ void HitungBagianWaris(Queue* queue,NTree tree,char* parentName){
         }
     }
 
-    if(TargetNode->Parents != NULL && TargetNode->Parents->Pasangan != NULL && TargetNode->Parents->Pasangan->Identitas.IsHidup){
+    if(TargetNode->Parents != NULL && TargetNode->Parents->Pasangan != NULL ){
         if(TargetNode->Parents->Pasangan->Identitas.Gender == 0){
             if(TargetNode->FirstSon != NULL){ //bagian ibu(diakses sebagai pasangan parents) ketika ada anak
                 pembagian = 1.0/6.0;
                 strcpy(hubungan, "ibu");
+                printf("\n\ntest\n\n");
                 EnQueue(queue,TargetNode->Parents->Pasangan,pembagian,hubungan);
             }else{
                 pembagian = 1.0/3.0; //bagian ibu(diakses sebagai pasangan parents) ketika tidak ada anak;
                 strcpy(hubungan, "ibu");
+                printf("\n\ntest1\n\n");
                 EnQueue(queue,TargetNode->Parents->Pasangan,pembagian,hubungan);
             }            
-        }else{
-            pembagian = 1.0/6.0; //bagian ayah(diakses sebagai pasangan parents) 
-            strcpy(hubungan, "ayah");
-            EnQueue(queue,TargetNode->Parents->Pasangan,pembagian,hubungan);
-        }
+        }else if(TargetNode->FirstSon == NULL){  //bagian suami ketika tidak ada anak
+                pembagian = 1.0/2.0;
+                strcpy(hubungan, "ayah");
+                EnQueue(queue,TargetNode->Parents->Pasangan,pembagian,hubungan);
+            }else{
+                pembagian = 1.0/4.0; //bagian suami ketika ada anak
+                strcpy(hubungan, "ayah");
+                EnQueue(queue,TargetNode->Parents->Pasangan,pembagian,hubungan);
+            }
     }
 
-    if(TargetNode->Parents != NULL && TargetNode->Parents->Identitas.IsHidup){
+    if(TargetNode->Parents != NULL ){
         if(TargetNode->Parents->Identitas.Gender == 0){
             if(TargetNode->FirstSon != NULL){ //bagian ibu ketika ada anak
                 pembagian = 1.0/6.0;
                 strcpy(hubungan, "ibu");
+                printf("\n\ntest3\n\n");
                 EnQueue(queue,TargetNode->Parents,pembagian,hubungan);
             }else{
                 pembagian = 1.0/3.0; //bagian ibu ketika tidak ada anak;
                 strcpy(hubungan, "ibu");
+                printf("\n\ntest4\n\n");
                 EnQueue(queue,TargetNode->Parents,pembagian,hubungan);
             }            
-        }else{
-            pembagian = 1.0/6.0; //bagian ayah 
-            strcpy(hubungan, "ayah");
-            EnQueue(queue,TargetNode->Parents,pembagian,hubungan);
-        }        
+        }else if(TargetNode->FirstSon == NULL){  //bagian suami ketika tidak ada anak
+                pembagian = 1.0/2.0;
+                strcpy(hubungan, "ayah");
+                EnQueue(queue,TargetNode->Parents,pembagian,hubungan);
+            }else{
+                pembagian = 1.0/4.0; //bagian suami ketika ada anak
+                strcpy(hubungan, "ayah");
+                EnQueue(queue,TargetNode->Parents,pembagian,hubungan);
+            }      
     }
 
     if(TargetNode->Parents != NULL && TargetNode->Parents->FirstSon != NULL && TargetNode->FirstSon == NULL){ //perhitungan pada saudara node
