@@ -1312,6 +1312,7 @@ void CollectFamilyData(NkAdd node, FamilyData* data, int* count, NkAdd* visited,
         CollectFamilyData(node->NextBrother, data, count, visited, visitedCount, root);
 }
 
+/*Prosedur file dan assets*/
 int RangeUsiaAnak (NkAdd Ortu) {
     int hasil;
 
