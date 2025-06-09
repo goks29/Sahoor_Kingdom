@@ -11,6 +11,10 @@ int main() {
     char nama[50], NodeMati[50];
     system("cls");
 
+    printFromFile("assets/RulesGame.txt");
+    system("pause");
+    system("cls");
+
     // Muat data dari file
     getDataFromFile(&tree);
 
@@ -91,6 +95,9 @@ int main() {
                 break;
 
             case 4:
+                system("cls");
+                printFromFile("assets/RulesWaris.txt");
+                system("pause");
                 system("cls");
                 printFromFile("assets/PenerusHarta.txt");
                 printf("\n==============================================================\n");
