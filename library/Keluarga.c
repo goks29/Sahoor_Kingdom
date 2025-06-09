@@ -29,7 +29,7 @@ void InsertLeluhur(NTree* tree) {
         printf("Masukkan gender (1 = Pria, 0 = Wanita): ");
         scanf("%d", &gender);
         getchar(); /* code */
-    } while (gender != 1 || gender != 2);
+    } while (gender != 1 && gender != 0);
      
     newRoot = CreateNode(NULL,NamaLeluhur,usia,gender,isHidup);
     tree->root = newRoot;   
@@ -166,7 +166,7 @@ void InsertMember(NTree* tree, char* parentName) {
         }else{
             gender = 1;
         }       /* code */
-    } while (tempGender != 0 || tempGender != 1);
+    } while (tempGender != 0 && tempGender != 1);
     
 
 

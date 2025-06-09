@@ -1,2 +1,3 @@
 LELUHUR, gok, 59, 1, 1
 PASANGAN, gok, sumin, 45, 0, 1
+ANAK, sumin, goklas, 1, 1
