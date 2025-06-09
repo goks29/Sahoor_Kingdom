@@ -19,7 +19,7 @@
                                                  =========  1. Anak harus berumur minimal 18 tahun lebih muda dari Orang Tua   =========                                                                      
                                                  =========  2. Maksimal penambahan anggota keluarga dibawah leluhur adalah 110 =========                                                           
                                                  =========     anggota keluarga                                                =========
-                                                 =========                                                                     =========
+                                                 =========  3. Selalu tambahkan anak pada node laki-laki  (Ayah)               =========
                                                  =========                                                                     =========
                                                  =========                                                       	           =========
                                                  =========                                                      	           =========

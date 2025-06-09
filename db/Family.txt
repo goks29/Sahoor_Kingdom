@@ -1,9 +1,19 @@
-LELUHUR, gok, 140, 1, 0
-PASANGAN, gok, sumin, 140, 0, 0
-ANAK, gok, gaga, 122, 1, 0
-KELUARGA_PASANGAN, sumin, lee, 158, 1, min, 158, 0
-PASANGAN, gaga, gege, 49, 0, 0
-ANAK, gege, gagagaga, 31, 1, 0
-ANAK, gok, hahaha, 122, 1, 0
-PASANGAN, hahaha, hehehe, 39, 0, 0
-PASANGAN, gagagaga, hahahahahha, 39, 0, 0
+LELUHUR, gok, 121, 1, 1
+PASANGAN, gok, sumin, 121, 0, 1
+KELUARGA_PASANGAN, sumin, lee, 139, 1, min, 139, 0
+SAUDARA_PASANGAN, sumin, broder, 119, 1, 1
+ANAK, sumin, sumanto, 75, 1, 0
+ANAK, gok, sumanto, 93, 1, 1
+PASANGAN, sumanto, rahayu, 76, 0, 0
+ANAK, sumin, suminti, 75, 0, 0
+PASANGAN, suminti, haryono, 82, 1, 0
+ANAK, haryono, joko, 57, 1, 0
+ANAK, suminti, joko, 56, 1, 0
+ANAK, sumanto, jaqi, 56, 1, 0
+ANAK, gok, suminti, 93, 0, 1
+PASANGAN, jaqi, amanda, 56, 0, 0
+ANAK, jaqi, hari, 38, 1, 0
+PASANGAN, hari, yuni, 38, 0, 0
+ANAK, hari, koni, 20, 1, 0
+PASANGAN, koni, sumarni, 21, 0
+ANAK, koni, parai, 2, 1
