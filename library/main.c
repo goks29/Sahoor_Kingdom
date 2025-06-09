@@ -128,7 +128,7 @@ int main() {
                 int years;
                 scanf("%d", &years);
                 getchar();
-                TimeSkip(tree.root, years);
+                TimeSkip(tree.root, years,&tree);
                 printf("\n\nTekan enter untuk melanjutkan...\n");
                 getchar();
                 break;

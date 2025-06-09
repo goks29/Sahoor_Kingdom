@@ -40,11 +40,20 @@ void AddChild(NTree* T, NkAdd current, const char* parents, infotype name, int u
         return;
     }
 
-    NkAdd newChild = CreateNode(ayah, name, usia, gender, hidup);
+    NkAdd SudahAda = SearchNode(T->root, name);
+    NkAdd newChild;
+
+    if (SudahAda != NULL) {
+        printf("\nNama sudah ada, silahkan beri nama lain.\n");
+        getch();
+        return;
+    } else {
+        newChild = CreateNode(ayah,name,usia,gender,hidup);
+    }
 
     if (ayah->FirstSon == NULL) {
         ayah->FirstSon = newChild;
-        ibu->FirstSon = newChild;  // sinkronisasi anak di pasangan
+        ibu->FirstSon = newChild; 
         printf("\n%s merupakan first son dari %s dan %s\n", name, ayah->Identitas.Nama, ibu->Identitas.Nama);
     } else {
         NkAdd temp = ayah->FirstSon;

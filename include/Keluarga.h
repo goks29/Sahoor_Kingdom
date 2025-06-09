@@ -39,7 +39,7 @@ void HitungBagianWaris(Queue* Queue,NTree tree,char* parentName);
 
 void printHarta(Qaddress Q,int harta,int *sisa);
 
-void TimeSkip(NkAdd node, int year);
+void TimeSkip(NkAdd node, int year, NTree*);
 
 void PrintSilsilah(NTree tree);
 
@@ -59,7 +59,7 @@ void ReadFamilyFromFile(FamilyData* data, int* count);
 
 void UpdateFamilyData(FamilyData* existing, int* existingCount, FamilyData* newData, int newCount);
 
-void WriteFamilyToFile(FamilyData* data, int count);
+void WriteFamilyToFile(FamilyData* data, int count, int year);
 
 void UpdateAges(NkAdd node, int year, NkAdd* visited, int* visitedCount);
 
