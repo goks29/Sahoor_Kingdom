@@ -612,7 +612,7 @@ void WarisHarta(NTree tree,char* parentName,int harta){
     int i = 1;
     while(Q != NULL){
         printf("\n\n===============================\n");
-        printf("Pewaris Ke-%d adalah %s",i,Q->data->Identitas.Nama);
+        printf("Pewaris Ke-%d adalah %s yang merupakan %s dari mayyit",i,Q->data->Identitas.Nama,Q->hubungan);
         printf("\nMendapat bagian sebesar %.2f dari harta mayyit",Q->bagianHarta);
         printHarta(Q,harta,&sisaharta);
         printf("\n===============================\n");    
@@ -638,6 +638,7 @@ void printHarta(Qaddress Q, int harta, int *sisa) {
 void HitungBagianWaris(Queue* queue,NTree tree,char* parentName){
     double pembagian;
     int i,JmlSaudara,sdrLaki,sdrPerempuan;
+    char hubungan[20];
     NkAdd nodeSaudara;
     JmlSaudara = 1;
     NkAdd TargetNode = SearchNode(tree.root,parentName);
@@ -650,18 +651,22 @@ void HitungBagianWaris(Queue* queue,NTree tree,char* parentName){
         if(TargetNode->Pasangan->Identitas.Gender == 1){
             if(TargetNode->FirstSon == NULL){  //bagian suami ketika tidak ada anak
                 pembagian = 1.0/2.0;
-                EnQueue(queue,TargetNode->Pasangan,pembagian);
+                strcpy(hubungan, "suami");
+                EnQueue(queue,TargetNode->Pasangan,pembagian,hubungan);
             }else{
                 pembagian = 1.0/4.0; //bagian suami ketika ada anak
-                EnQueue(queue,TargetNode->Pasangan,pembagian);
+                strcpy(hubungan, "suami");
+                EnQueue(queue,TargetNode->Pasangan,pembagian,hubungan);
             }
         }else{
             if(TargetNode->FirstSon == NULL){ //bagian istri ketika tidak ada anak
                 pembagian = 1.0/4.0;
-                EnQueue(queue,TargetNode->Pasangan,pembagian);
+                strcpy(hubungan, "istri");
+                EnQueue(queue,TargetNode->Pasangan,pembagian,hubungan);
             }else{  
                 pembagian = 1.0/8.0; //bagian istri ketika ada anak
-                EnQueue(queue,TargetNode->Pasangan,pembagian);
+                strcpy(hubungan, "istri");
+                EnQueue(queue,TargetNode->Pasangan,pembagian,hubungan);
             }            
         }
     }
@@ -670,14 +675,17 @@ void HitungBagianWaris(Queue* queue,NTree tree,char* parentName){
         if(TargetNode->Parents->Pasangan->Identitas.Gender == 0){
             if(TargetNode->FirstSon != NULL){ //bagian ibu(diakses sebagai pasangan parents) ketika ada anak
                 pembagian = 1.0/6.0;
-                EnQueue(queue,TargetNode->Parents->Pasangan,pembagian);
+                strcpy(hubungan, "ibu");
+                EnQueue(queue,TargetNode->Parents->Pasangan,pembagian,hubungan);
             }else{
                 pembagian = 1.0/3.0; //bagian ibu(diakses sebagai pasangan parents) ketika tidak ada anak;
-                EnQueue(queue,TargetNode->Parents->Pasangan,pembagian);
+                strcpy(hubungan, "ibu");
+                EnQueue(queue,TargetNode->Parents->Pasangan,pembagian,hubungan);
             }            
         }else{
             pembagian = 1.0/6.0; //bagian ayah(diakses sebagai pasangan parents) 
-            EnQueue(queue,TargetNode->Parents->Pasangan,pembagian);
+            strcpy(hubungan, "ayah");
+            EnQueue(queue,TargetNode->Parents->Pasangan,pembagian,hubungan);
         }
     }
 
@@ -685,14 +693,17 @@ void HitungBagianWaris(Queue* queue,NTree tree,char* parentName){
         if(TargetNode->Parents->Identitas.Gender == 0){
             if(TargetNode->FirstSon != NULL){ //bagian ibu ketika ada anak
                 pembagian = 1.0/6.0;
-                EnQueue(queue,TargetNode->Parents,pembagian);
+                strcpy(hubungan, "ibu");
+                EnQueue(queue,TargetNode->Parents,pembagian,hubungan);
             }else{
                 pembagian = 1.0/3.0; //bagian ibu ketika tidak ada anak;
-                EnQueue(queue,TargetNode->Parents,pembagian);
+                strcpy(hubungan, "ibu");
+                EnQueue(queue,TargetNode->Parents,pembagian,hubungan);
             }            
         }else{
             pembagian = 1.0/6.0; //bagian ayah 
-            EnQueue(queue,TargetNode->Parents,pembagian);
+            strcpy(hubungan, "ayah");
+            EnQueue(queue,TargetNode->Parents,pembagian,hubungan);
         }        
     }
 
@@ -720,25 +731,27 @@ void HitungBagianWaris(Queue* queue,NTree tree,char* parentName){
                     nodeSaudara = nodeSaudara->NextBrother;
                 }
             }
-            if(sdrPerempuan == 0){
+            if(sdrPerempuan == 0){//bagian saudara laki2 tunggal
                 nodeSaudara = TargetNode->Parents->FirstSon;
                 pembagian = (1.0/2.0)/sdrLaki;
                 while(nodeSaudara != NULL){
                     if(nodeSaudara->Identitas.Nama == TargetNode->Identitas.Nama ){
                         nodeSaudara = nodeSaudara->NextBrother;
                     }else if(nodeSaudara->Identitas.IsHidup){
-                        EnQueue(queue,nodeSaudara,pembagian);
+                        strcpy(hubungan, "sdr laki-laki");
+                        EnQueue(queue,nodeSaudara,pembagian,hubungan);
                         nodeSaudara = nodeSaudara->NextBrother;
                     }
                 }
-            }else if(sdrLaki == 0){
+            }else if(sdrLaki == 0){//bagian saudara perempuan tnggall
                 nodeSaudara = TargetNode->Parents->FirstSon;
                 pembagian = (2.0/3.0)/sdrPerempuan;
                 while(nodeSaudara != NULL){
                     if(nodeSaudara->Identitas.Nama == TargetNode->Identitas.Nama){
                         nodeSaudara = nodeSaudara->NextBrother;
                     }else if(nodeSaudara->Identitas.IsHidup){
-                        EnQueue(queue,nodeSaudara,pembagian);
+                        strcpy(hubungan, "sdr perempuan");
+                        EnQueue(queue,nodeSaudara,pembagian,hubungan);
                         nodeSaudara = nodeSaudara->NextBrother;
                     }
                 }                
@@ -749,20 +762,24 @@ void HitungBagianWaris(Queue* queue,NTree tree,char* parentName){
                         nodeSaudara = nodeSaudara->NextBrother;
                     }else if(nodeSaudara->Identitas.Gender = 1 && nodeSaudara->Identitas.IsHidup){
                         pembagian = (1.0/2.0)/sdrLaki;
-                        EnQueue(queue,nodeSaudara,pembagian);
+                        strcpy(hubungan, "sdr laki-laki");
+                        EnQueue(queue,nodeSaudara,pembagian,hubungan);
                     }else if(nodeSaudara->Identitas.IsHidup){
                         pembagian = (1.0/4.0)/sdrPerempuan;
-                        EnQueue(queue,nodeSaudara,pembagian);
+                        strcpy(hubungan, "sdr perempuan");
+                        EnQueue(queue,nodeSaudara,pembagian,hubungan);
                     }
                 }
             }
         }else{
             if(nodeSaudara->Identitas.Gender == 0 && nodeSaudara->Identitas.IsHidup){
                 pembagian = 1.0/2.0;
-                EnQueue(queue,nodeSaudara,pembagian);
+                strcpy(hubungan, "sdr perempuan");
+                EnQueue(queue,nodeSaudara,pembagian,hubungan);
             }else if(nodeSaudara->Identitas.IsHidup){
                 pembagian = 1.0/2.0;
-                EnQueue(queue,nodeSaudara,pembagian);
+                strcpy(hubungan, "sdr laki-laki");
+                EnQueue(queue,nodeSaudara,pembagian,hubungan);
             }
         }
     }
@@ -798,7 +815,8 @@ void HitungBagianWaris(Queue* queue,NTree tree,char* parentName){
                     if(nodeSaudara->Identitas.Nama == TargetNode->Identitas.Nama){
                         nodeSaudara = nodeSaudara->NextBrother;
                     }else{
-                        EnQueue(queue,nodeSaudara,pembagian);
+                        strcpy(hubungan, "anak laki-laki");
+                        EnQueue(queue,nodeSaudara,pembagian,hubungan);
                         nodeSaudara = nodeSaudara->NextBrother;
                     }
                 }
@@ -809,7 +827,8 @@ void HitungBagianWaris(Queue* queue,NTree tree,char* parentName){
                     if(nodeSaudara->Identitas.Nama == TargetNode->Identitas.Nama){
                         nodeSaudara = nodeSaudara->NextBrother;
                     }else{
-                        EnQueue(queue,nodeSaudara,pembagian);
+                        strcpy(hubungan, "anak perempuan");
+                        EnQueue(queue,nodeSaudara,pembagian,hubungan);
                         nodeSaudara = nodeSaudara->NextBrother;
                     }
                 }                
@@ -819,21 +838,25 @@ void HitungBagianWaris(Queue* queue,NTree tree,char* parentName){
                     if(nodeSaudara->Identitas.Nama == TargetNode->Identitas.Nama){
                         nodeSaudara = nodeSaudara->NextBrother;
                     }else if(nodeSaudara->Identitas.Gender = 1){
+                        strcpy(hubungan, "anak laki-laki");
                         pembagian = (1.0/2.0)/sdrLaki;
-                        EnQueue(queue,nodeSaudara,pembagian);
+                        EnQueue(queue,nodeSaudara,pembagian,hubungan);
                     }else{
+                        strcpy(hubungan, "anak perempuan");
                         pembagian = (1.0/4.0)/sdrPerempuan;
-                        EnQueue(queue,nodeSaudara,pembagian);
+                        EnQueue(queue,nodeSaudara,pembagian,hubungan);
                     }
                 }
             }
         }else{
             if(nodeSaudara->Identitas.Gender == 0){
+                strcpy(hubungan, "anak perempuan");
                 pembagian = 1.0/2.0;
-                EnQueue(queue,nodeSaudara,pembagian);
+                EnQueue(queue,nodeSaudara,pembagian,hubungan);
             }else{
+                strcpy(hubungan, "anak laki-laki");
                 pembagian = 1.0/2.0;
-                EnQueue(queue,nodeSaudara,pembagian);
+                EnQueue(queue,nodeSaudara,pembagian,hubungan);
             }
         }        
         }

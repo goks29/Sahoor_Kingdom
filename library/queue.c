@@ -13,11 +13,12 @@ boolean IsEmptyQueue(Queue* Q) {
     }
 }
 
-void EnQueue (Queue* Q, NkAdd node,double bagian) {
+void EnQueue (Queue* Q, NkAdd node,double bagian,char* hubungan) {
     QNode* NewNodeQ = (QNode*)malloc(sizeof(QNode));
     if (NewNodeQ != NULL) {
         NewNodeQ->data = node;
         NewNodeQ->bagianHarta = bagian;
+        strcpy(NewNodeQ->hubungan, hubungan);
         NewNodeQ->next = NULL;
 
         if (IsEmptyQueue(Q)) {
