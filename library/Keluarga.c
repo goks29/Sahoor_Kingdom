@@ -14,21 +14,23 @@ void InsertLeluhur(NTree* tree) {
     }
 
     char NamaLeluhur[50];
-    int usia, gender, isHidup,prosespilih;
+    int usia, gender, isHidup;
 
+    printf("Masukkan nama leluhur: ");
+    scanf(" %[^\n]", NamaLeluhur);
+    getchar();
     do{
-        printf("Masukkan nama leluhur: ");
-        scanf(" %[^\n]", NamaLeluhur);
-        getchar();
         printf("Masukkan usia: ");
         scanf("%d", &usia);
+        getchar();
+    }while (usia >= 110);
+    do
+    {
         printf("Masukkan gender (1 = Pria, 0 = Wanita): ");
         scanf("%d", &gender);
-        getchar();   
-        printf("Apakah Input Sudah Benar(1 = ya, 2 = tidak) : ");
-        scanf("%d",&prosespilih);
-        } while (prosespilih == 2);
-    
+        getchar(); /* code */
+    } while (gender != 1 || gender != 2);
+     
     newRoot = CreateNode(NULL,NamaLeluhur,usia,gender,isHidup);
     tree->root = newRoot;   
     printf("Leluhur berhasil ditambahkan");
@@ -149,15 +151,24 @@ void InsertMember(NTree* tree, char* parentName) {
     printf("Masukan Nama Anak dari %s : ",parentName);
     scanf(" %[^\n]",namaAnak);
     int range = RangeUsiaAnak(current);
-    printf("Masukan Usia %s (range usia 1 - %d tahun) : ",namaAnak,range);
-    scanf("%d",&umur);
-    printf("Pilih Gender %s (0 = Perempuan, 1 = Laki-laki) : ",namaAnak);
-    scanf("%d",&tempGender);
-    if(tempGender == 0){
-        gender = 0;
-    }else{
-        gender = 1;
-    }
+    do
+    {
+        printf("Masukan Usia %s (range usia 1 - %d tahun) : ",namaAnak,range);
+        scanf("%d",&umur);        /* code */
+    } while (umur < 1 || umur > range);
+    
+    do
+    {
+        printf("Pilih Gender %s (0 = Perempuan, 1 = Laki-laki) : ",namaAnak);
+        scanf("%d",&tempGender);
+        if(tempGender == 0){
+            gender = 0;
+        }else{
+            gender = 1;
+        }       /* code */
+    } while (tempGender != 0 || tempGender != 1);
+    
+
 
     AddChild(tree, current, parentName, namaAnak, umur, gender, IsHidup);
     
